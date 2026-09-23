@@ -5,6 +5,10 @@ import axios from "axios";
 import LessonViewer from "./LessonViewer";
 import CertificateModal from "./CertificateModal";
 import CourseSkeleton from "../common/CourseSkeleton";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/Card";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Progress } from "../ui/Progress";
 import "./student.css";
 
 const Student = () => {
@@ -86,268 +90,144 @@ const Student = () => {
     const totalHours = enrollments.reduce(
       (sum, e) => sum + (e.progress || 0),
       0
-    ); // Placeholder calculation
+    );
 
     return (
-      <div
-        style={{
-          backgroundColor: "var(--bg-color)",
-          minHeight: "100vh",
-          padding: "var(--padding)",
-          fontFamily: "sans-serif",
-          textAlign: "left",
-        }}
-      >
-        <button
-          style={{
-            backgroundColor: "var(--button-bg)",
-            color: "var(--button-color)",
-            padding: "var(--button-padding)",
-            borderRadius: "var(--border-radius-small)",
-            border: "none",
-            cursor: "pointer",
-            marginBottom: "16px",
-          }}
-          onClick={() => navigate("/")}
-        >
-          ← Back to Main
-        </button>
-        <h1
-          style={{
-            fontSize: "var(--font-size-h1)",
-            fontWeight: "bold",
-            color: "var(--text-color)",
-            marginBottom: "16px",
-          }}
-        >
-          Welcome back, {user?.name || "Student"}!
-        </h1>
-        <p style={{ color: "var(--secondary-text)", marginBottom: "24px" }}>
-          Here's an overview of your learning progress.
-        </p>
-        <div className="student-responsive-grid">
-          <div
-            style={{
-              backgroundColor: "var(--card-bg)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid var(--border-color)",
-              borderRadius: "var(--border-radius)",
-              padding: "var(--card-padding)",
-              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "var(--font-size-h3)",
-                fontWeight: "600",
-                color: "var(--text-color)",
-                marginBottom: "var(--spacing-sm)",
-              }}
+      <div className="min-h-screen bg-background text-foreground p-6 sm:p-8 space-y-8 text-left">
+        {/* Header and Back Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="mb-3 gap-2 text-muted-foreground hover:text-foreground"
             >
-              Courses Enrolled
-            </h3>
-            <p
-              style={{ fontSize: "2rem", fontWeight: "bold", color: "#3b82f6" }}
-            >
-              {loading ? "..." : enrolledCount}
+              ← Back to Main
+            </Button>
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+              Welcome back, {user?.name || "Student"}! 👋
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Here's an overview of your learning journey and recent progress.
             </p>
           </div>
-          <div
-            style={{
-              backgroundColor: "var(--card-bg)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid var(--border-color)",
-              borderRadius: "var(--border-radius)",
-              padding: "var(--card-padding)",
-              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            }}
+          <Button
+            variant="default"
+            size="default"
+            onClick={() => setActiveAndClose("courses")}
+            className="shadow-sm font-semibold"
           >
-            <h3
-              style={{
-                fontSize: "var(--font-size-h3)",
-                fontWeight: "600",
-                color: "var(--text-color)",
-                marginBottom: "var(--spacing-sm)",
-              }}
-            >
-              Completed Courses
-            </h3>
-            <p
-              style={{ fontSize: "2rem", fontWeight: "bold", color: "#10b981" }}
-            >
-              {loading ? "..." : completedCount}
-            </p>
-          </div>
-          <div
-            style={{
-              backgroundColor: "var(--card-bg)",
-              backdropFilter: "blur(4px)",
-              border: "1px solid var(--border-color)",
-              borderRadius: "var(--border-radius)",
-              padding: "var(--card-padding)",
-              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "var(--font-size-h3)",
-                fontWeight: "600",
-                color: "var(--text-color)",
-                marginBottom: "var(--spacing-sm)",
-              }}
-            >
-              Hours Studied
-            </h3>
-            <p
-              style={{ fontSize: "2rem", fontWeight: "bold", color: "#f59e0b" }}
-            >
-              {loading ? "..." : totalHours}
-            </p>
-          </div>
+            Continue Learning
+          </Button>
         </div>
-        <div
-          style={{
-            backgroundColor: "var(--card-bg)",
-            backdropFilter: "blur(4px)",
-            border: "1px solid var(--border-color)",
-            borderRadius: "16px",
-            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
-            padding: "var(--card-padding)",
-            marginTop: "var(--card-margin-bottom)",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "var(--font-size-h2)",
-              fontWeight: "bold",
-              color: "var(--text-color)",
-              marginBottom: "16px",
-            }}
-          >
-            Recent Activity
-          </h2>
-          <ul
-            className="student-recent-activity"
-            style={{ listStyle: "none", padding: 0, margin: 0 }}
-          >
-            <li
-              style={{
-                padding: "var(--spacing-md)",
-                borderBottom: "1px solid var(--border-color)",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div
-                className="student-activity-dot"
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor: "#3b82f6",
-                  marginRight: "var(--spacing-md)",
-                }}
-              ></div>
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--text-color)",
-                    fontWeight: "500",
-                  }}
-                >
-                  Completed lesson: Introduction to React
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--muted-text)",
-                    fontSize: "var(--font-size-small)",
-                  }}
-                >
-                  2 hours ago
-                </p>
+
+        {/* KPI Stat Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Card 1 */}
+          <Card className="hover:border-primary/40 transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Enrolled Courses
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
               </div>
-            </li>
-            <li
-              style={{
-                padding: "var(--spacing-md)",
-                borderBottom: "1px solid var(--border-color)",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div
-                className="student-activity-dot"
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor: "#10b981",
-                  marginRight: "var(--spacing-md)",
-                }}
-              ></div>
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--text-color)",
-                    fontWeight: "500",
-                  }}
-                >
-                  Enrolled in: Advanced JavaScript
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--muted-text)",
-                    fontSize: "var(--font-size-small)",
-                  }}
-                >
-                  1 day ago
-                </p>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tracking-tight text-foreground">
+                {loading ? "..." : enrolledCount}
               </div>
-            </li>
-            <li
-              style={{
-                padding: "var(--spacing-md)",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div
-                className="student-activity-dot"
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor: "#f59e0b",
-                  marginRight: "var(--spacing-md)",
-                }}
-              ></div>
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--text-color)",
-                    fontWeight: "500",
-                  }}
-                >
-                  Started quiz: CSS Fundamentals
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "var(--muted-text)",
-                    fontSize: "var(--font-size-small)",
-                  }}
-                >
-                  3 days ago
-                </p>
+              <div className="mt-2 flex items-center gap-1.5">
+                <Badge variant="primary" className="text-[11px]">Active</Badge>
+                <span className="text-xs text-muted-foreground">in current curriculum</span>
               </div>
-            </li>
-          </ul>
+            </CardContent>
+          </Card>
+
+          {/* Card 2 */}
+          <Card className="hover:border-emerald-500/40 transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Completed Courses
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tracking-tight text-foreground">
+                {loading ? "..." : completedCount}
+              </div>
+              <div className="mt-2 flex items-center gap-1.5">
+                <Badge variant="success" className="text-[11px]">Certificates earned</Badge>
+                <span className="text-xs text-muted-foreground">verified completion</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 3 */}
+          <Card className="hover:border-amber-500/40 transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Study Progress Index
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tracking-tight text-foreground">
+                {loading ? "..." : `${totalHours} pts`}
+              </div>
+              <div className="mt-2 flex items-center gap-1.5">
+                <Badge variant="warning" className="text-[11px]">Consistent</Badge>
+                <span className="text-xs text-muted-foreground">calculated progress units</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Recent Activity Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>
+              Your latest interactions, completed modules, and quiz checkpoints.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
+              <div className="relative flex items-start gap-4">
+                <div className="absolute -left-[27px] mt-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-primary ring-2 ring-primary/20" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Completed lesson: Introduction to React</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">2 hours ago</p>
+                </div>
+              </div>
+              <div className="relative flex items-start gap-4">
+                <div className="absolute -left-[27px] mt-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-emerald-500 ring-2 ring-emerald-500/20" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Enrolled in: Advanced JavaScript</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">1 day ago</p>
+                </div>
+              </div>
+              <div className="relative flex items-start gap-4">
+                <div className="absolute -left-[27px] mt-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-amber-500 ring-2 ring-amber-500/20" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Started quiz: CSS Fundamentals</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">3 days ago</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   };
@@ -380,166 +260,117 @@ const Student = () => {
     }, []);
 
     return (
-      <div
-        style={{
-          backgroundColor: "var(--bg-color)",
-          minHeight: "100vh",
-          padding: "var(--padding)",
-          fontFamily: "sans-serif",
-          textAlign: "left",
-        }}
-      >
-        <button
-          style={{
-            backgroundColor: "var(--button-bg)",
-            color: "var(--button-color)",
-            padding: "var(--button-padding)",
-            borderRadius: "var(--border-radius-small)",
-            border: "none",
-            cursor: "pointer",
-            marginBottom: "16px",
-          }}
-          onClick={() => navigate("/")}
-        >
-          ← Back to Main
-        </button>
-        <h1
-          style={{
-            fontSize: "var(--font-size-h1)",
-            fontWeight: "bold",
-            color: "var(--text-color)",
-            marginBottom: "32px",
-          }}
-        >
-          My Courses
-        </h1>
+      <div className="min-h-screen bg-background text-foreground p-6 sm:p-8 space-y-8 text-left">
+        <div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="mb-3 gap-2 text-muted-foreground hover:text-foreground"
+          >
+            ← Back to Main
+          </Button>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            My Courses
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Pick up where you left off or review completed courses.
+          </p>
+        </div>
+
         {loading ? (
-          <div className="student-responsive-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <CourseSkeleton count={4} />
           </div>
         ) : enrollments.length === 0 ? (
-          <p style={{ color: "var(--secondary-text)" }}>
-            You haven't enrolled in any courses yet.
-          </p>
+          <Card className="p-12 text-center">
+            <p className="text-muted-foreground mb-4">
+              You haven't enrolled in any courses yet.
+            </p>
+            <Button onClick={() => navigate("/courses")}>
+              Browse Course Catalog
+            </Button>
+          </Card>
         ) : (
-          <div className="student-responsive-grid">
-            {enrollments.map((enrollment) => (
-              <div
-                key={enrollment.id}
-                className="student-course-card"
-                style={{
-                  backgroundColor: "var(--card-bg)",
-                  backdropFilter: "blur(4px)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "16px",
-                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
-                  padding: "var(--card-padding)",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <img
-                  src={
-                    enrollment.course.thumbnailUrl || "/img/student/python.png"
-                  }
-                  alt={enrollment.course.title}
-                  style={{
-                    width: "100%",
-                    height: "200px",
-                    objectFit: "cover",
-                    borderRadius: "var(--border-radius)",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    marginBottom: "var(--spacing-md)",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  }}
-                />
-                <h3
-                  style={{
-                    fontSize: "var(--font-size-h3)",
-                    fontWeight: "600",
-                    color: "var(--text-color)",
-                    marginBottom: "var(--spacing-sm)",
-                  }}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {enrollments.map((enrollment) => {
+              const isCompleted =
+                enrollment.progress === 100 || enrollment.status === "completed";
+              return (
+                <Card
+                  key={enrollment.id}
+                  className="overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 hover:border-primary/40 group"
                 >
-                  {enrollment.course.title}
-                </h3>
-                <p
-                  style={{
-                    color: "var(--secondary-text)",
-                    marginBottom: "var(--spacing-md)",
-                    flex: 1,
-                  }}
-                >
-                  {enrollment.course.description}
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "var(--font-size-small)",
-                      color: "var(--muted-text)",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Progress: {enrollment.progress || 0}%
-                  </span>
-                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                    {(enrollment.progress === 100 || enrollment.status === "completed") && (
-                      <button
-                        type="button"
-                        style={{
-                          backgroundColor: "#d97706",
-                          color: "#ffffff",
-                          padding: "0.5rem 0.875rem",
-                          borderRadius: "var(--border-radius-small)",
-                          border: "none",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontWeight: "600",
-                          fontSize: "0.8125rem",
-                          boxShadow: "0 2px 4px rgba(217, 119, 6, 0.2)",
-                        }}
-                        onClick={() =>
-                          setSelectedCertificate({
-                            courseTitle: enrollment.course.title,
-                            instructorName: enrollment.course.instructor?.name || "Lead Instructor",
-                            studentName: user?.name,
-                          })
-                        }
-                      >
-                        🎓 Certificate
-                      </button>
-                    )}
-                    <button
-                      style={{
-                        backgroundColor: "var(--button-bg)",
-                        color: "var(--button-color)",
-                        padding: "var(--button-padding)",
-                        borderRadius: "var(--border-radius-small)",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
-                      onClick={() =>
-                        navigate("/student/lesson", {
-                          state: { courseId: enrollment.course.id },
-                        })
+                  <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={
+                        enrollment.course.thumbnailUrl || "/img/student/python.png"
                       }
-                    >
-                      {enrollment.progress > 0 ? "Continue" : "Start"}
-                    </button>
+                      alt={enrollment.course.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 right-3">
+                      <Badge variant={isCompleted ? "success" : "default"}>
+                        {isCompleted ? "Completed" : "In Progress"}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+
+                  <div className="p-5 flex flex-col flex-1">
+                    <h3 className="text-lg font-bold text-foreground line-clamp-1 mb-2 group-hover:text-primary transition-colors">
+                      {enrollment.course.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1">
+                      {enrollment.course.description}
+                    </p>
+
+                    <div className="mt-auto space-y-4 pt-3 border-t border-border">
+                      <Progress
+                        value={enrollment.progress || 0}
+                        showLabel
+                        indicatorClassName={
+                          isCompleted ? "bg-emerald-500" : "bg-primary"
+                        }
+                      />
+
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        {isCompleted && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10 font-medium"
+                            onClick={() =>
+                              setSelectedCertificate({
+                                courseTitle: enrollment.course.title,
+                                instructorName:
+                                  enrollment.course.instructor?.name ||
+                                  "Lead Instructor",
+                                studentName: user?.name,
+                              })
+                            }
+                          >
+                            🎓 Certificate
+                          </Button>
+                        )}
+                        <Button
+                          variant={isCompleted ? "secondary" : "default"}
+                          size="sm"
+                          className="ml-auto"
+                          onClick={() =>
+                            navigate("/student/lesson", {
+                              state: { courseId: enrollment.course.id },
+                            })
+                          }
+                        >
+                          {enrollment.progress > 0 ? "Continue" : "Start"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
