@@ -1,4 +1,75 @@
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+
+/**
+ * 🛡️ Production-Grade HTTP Security Headers via Helmet
+ * Hardens the API against XSS, clickjacking, MIME sniffing, and unauthorized framing
+ * while supporting cross-origin media (Cloudinary) and OAuth popups (Discord, Google).
+ */
+export const securityHeaders = helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "https://res.cloudinary.com",
+        "https://*.cloudinary.com",
+        "https://lh3.googleusercontent.com",
+        "https://cdn.discordapp.com",
+      ],
+      mediaSrc: [
+        "'self'",
+        "blob:",
+        "https://res.cloudinary.com",
+        "https://*.cloudinary.com",
+      ],
+      connectSrc: [
+        "'self'",
+        "http://localhost:5000",
+        "http://localhost:5173",
+        "https://api.chapa.co",
+        "https://res.cloudinary.com",
+        "https://*.cloudinary.com",
+        "https://discord.com",
+      ],
+      frameSrc: ["'self'", "https://checkout.chapa.co"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+    },
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  xFrameOptions: { action: "sameorigin" },
+  xContentTypeOptions: true,
+  xDnsPrefetchControl: { allow: false },
+  xDownloadOptions: true,
+  xPermittedCrossDomainPolicies: { policy: "none" },
+  xXssProtection: true,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+});
+
+/**
+ * 🛡️ Permissions Policy Header
+ * Restricts browser features and sensitive hardware APIs (camera, microphone, geolocation)
+ */
+export const permissionsPolicy = (req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(self 'https://checkout.chapa.co')"
+  );
+  next();
+};
 
 // Rate limiter for login and registration attempts
 export const authLimiter = rateLimit({

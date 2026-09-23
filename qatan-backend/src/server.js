@@ -3,7 +3,6 @@
 // 🧩 Imports
 import express from "express";
 import cors from "cors";
-import helmet from "helmet";
 import dotenv from "dotenv";
 import { startEmailMonitoring, approveInstructorApplication, rejectInstructorApplication, getPendingInstructorApplications } from "./utils/emailMonitor.js";
 import { PrismaClient } from "@prisma/client";
@@ -11,7 +10,7 @@ import authRoutes from "./routes/auth.js";
 import discordAuthRoutes from "./routes/discordAuth.js";
 import instructorApplicationsRoutes from "./routes/instructorApplications.js";
 import cloudinary from "./utils/cloudinary.js";
-import { generalApiLimiter } from "./middleware/securityMiddleware.js";
+import { generalApiLimiter, securityHeaders, permissionsPolicy } from "./middleware/securityMiddleware.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
 // 🧱 Load environment variables
@@ -21,13 +20,9 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
-// 🛡️ Security Headers via Helmet (allow cross-origin resources for videos/thumbnails)
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-    contentSecurityPolicy: false,
-  })
-);
+// 🛡️ HTTP Security Headers via Helmet & Permissions-Policy
+app.use(securityHeaders);
+app.use(permissionsPolicy);
 
 // 🌐 Middlewares
 app.use(
