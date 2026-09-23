@@ -76,6 +76,68 @@
   font-size: 0.875rem;
 }
 
+.success-alert {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.otp-input {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  padding-left: calc(0.75rem + 0.5em);
+}
+
+.otp-resend-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.otp-resend-btn {
+  background: none;
+  border: none;
+  color: #0d7ff2;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.15s ease-in-out;
+}
+
+.otp-resend-btn:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.otp-resend-btn:hover:not(:disabled) {
+  color: #0a5dc2;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
