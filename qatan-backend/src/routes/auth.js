@@ -9,28 +9,32 @@ import {
   verifyResetCode,
   resetPassword,
 } from "../controllers/authController.js";
+import {
+  authLimiter,
+  passwordResetLimiter,
+} from "../middleware/securityMiddleware.js";
 
 const router = express.Router();
 
-// Register route
-router.post("/register", registerUser);
+// Register route (Rate-limited to prevent automated bot signups)
+router.post("/register", authLimiter, registerUser);
 
-// Login route
-router.post("/login", loginUser);
+// Login route (Rate-limited against brute-force attacks)
+router.post("/login", authLimiter, loginUser);
 
-// Verify code route
-router.post("/verify-code", verifyCode);
+// Verify email code route
+router.post("/verify-code", authLimiter, verifyCode);
 
-// Resend code route
-router.post("/resend-code", resendCode);
+// Resend verification code route (Rate-limited to prevent email inbox flood)
+router.post("/resend-code", passwordResetLimiter, resendCode);
 
-// Forgot password route
-router.post("/forgot-password", forgotPassword);
+// Forgot password route (Rate-limited to prevent OTP spam)
+router.post("/forgot-password", passwordResetLimiter, forgotPassword);
 
-// Verify reset code route
-router.post("/verify-reset-code", verifyResetCode);
+// Verify reset code route (Rate-limited against OTP brute-forcing)
+router.post("/verify-reset-code", passwordResetLimiter, verifyResetCode);
 
-// Reset password route
-router.post("/reset-password", resetPassword);
+// Reset password route (Rate-limited)
+router.post("/reset-password", passwordResetLimiter, resetPassword);
 
 export default router;

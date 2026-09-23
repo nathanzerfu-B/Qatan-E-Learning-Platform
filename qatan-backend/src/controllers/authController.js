@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/emailService.js";
 import { validateInstructorPasskey } from "../utils/emailMonitor.js";
 import { validateEmailDeliverability } from "../utils/emailVerificationService.js";
+import { validatePasswordStrength } from "../middleware/securityMiddleware.js";
 
 const prisma = new PrismaClient();
 
@@ -25,6 +26,12 @@ export const registerUser = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Missing fields" });
+    }
+
+    // Password complexity check
+    const passwordCheck = validatePasswordStrength(password);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({ success: false, message: passwordCheck.message });
     }
 
     // ✅ Instructor passkey validation
@@ -443,6 +450,12 @@ export const resetPassword = async (req, res) => {
         success: false,
         message: "Email, code, and new password are required",
       });
+    }
+
+    // Password complexity check
+    const passwordCheck = validatePasswordStrength(newPassword);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({ success: false, message: passwordCheck.message });
     }
 
     // Find and validate the reset code
