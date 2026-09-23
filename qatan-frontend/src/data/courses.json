@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "title": "Web Development Bootcamp",
+    "category": "Web Development",
+    "price": "Paid",
+    "author": "Samuel Green",
+    "duration": "25h",
+    "image": "/img/screenshot1.png",
+    "description": "This comprehensive bootcamp covers essential web development technologies including HTML, CSS, JavaScript, and modern frameworks to build responsive and dynamic websites."
+  },
+  {
+    "id": 2,
+    "title": "Intro to Digital Marketing",
+    "category": "Marketing",
+    "price": "Free",
+    "author": "John Doe",
+    "duration": "5h 30m",
+    "image": "/img/screenshot2.png",
+    "description": "Learn the fundamentals of digital marketing, including SEO, social media strategies, and content marketing to effectively promote brands online."
+  },
+  {
+    "id": 3,
+    "title": "Data Science Fundamentals",
+    "category": "Data Science",
+    "price": "Paid",
+    "author": "Jane Smith",
+    "duration": "12h",
+    "image": "/img/screenshot1.png",
+    "description": "Explore the basics of data science, including data analysis, visualization, and statistical modeling to extract insights from complex datasets."
+  },
+  {
+    "id": 4,
+    "title": "Graphic Design Masterclass",
+    "category": "Design",
+    "price": "Paid",
+    "author": "Emily White",
+    "duration": "18h",
+    "image": "/img/screenshot2.png",
+    "description": "Master graphic design principles and tools to create stunning visuals, logos, and branding materials for various media platforms."
+  },
+  {
+    "id": 5,
+    "title": "Photography Essentials",
+    "category": "Design",
+    "price": "Free",
+    "author": "Olivia Davis",
+    "duration": "5h 45m",
+    "image": "/img/screenshot1.png",
+    "description": "Learn essential photography techniques, including composition, lighting, and editing to capture professional-quality images."
+  },
+  {
+    "id": 6,
+    "title": "Advanced JavaScript",
+    "category": "Web Development",
+    "price": "Paid",
+    "author": "Mike Johnson",
+    "duration": "15h",
+    "image": "/img/screenshot2.png",
+    "description": "Deep dive into advanced JavaScript concepts such as closures, asynchronous programming, and modern ES6+ features for robust web apps."
+  },
+  {
+    "id": 7,
+    "title": "Machine Learning Basics",
+    "category": "Data Science",
+    "price": "Paid",
+    "author": "Alex Brown",
+    "duration": "20h",
+    "image": "/img/screenshot1.png",
+    "description": "Understand the fundamentals of machine learning algorithms, model training, and evaluation to build predictive models."
+  },
+  {
+    "id": 8,
+    "title": "SEO Strategies",
+    "category": "Marketing",
+    "price": "Paid",
+    "author": "Sarah Lee",
+    "duration": "8h",
+    "image": "/img/screenshot2.png",
+    "description": "Learn effective SEO strategies to improve website ranking, increase organic traffic, and optimize content for search engines."
+  },
+  {
+    "id": 9,
+    "title": "UI/UX Design Principles",
+    "category": "Design",
+    "price": "Paid",
+    "author": "Tom Wilson",
+    "duration": "10h",
+    "image": "/img/screenshot1.png",
+    "description": "Explore user interface and user experience design principles to create intuitive and engaging digital products."
+  },
+  {
+    "id": 10,
+    "title": "React for Beginners",
+    "category": "Web Development",
+    "price": "Free",
+    "author": "Lisa Garcia",
+    "duration": "14h",
+    "image": "/img/screenshot2.png",
+    "description": "Learn React from scratch, building interactive user interfaces with components, state, and props."
+  },
+  {
+    "id": 11,
+    "title": "Node.js Backend Development",
+    "category": "Web Development",
+    "price": "Paid",
+    "author": "David Kim",
+    "duration": "22h",
+    "image": "/img/screenshot1.png",
+    "description": "Build scalable server-side applications with Node.js, Express, and MongoDB."
+  },
+  {
+    "id": 12,
+    "title": "Full-Stack Web Development",
+    "category": "Web Development",
+    "price": "Paid",
+    "author": "Anna Patel",
+    "duration": "30h",
+    "image": "/img/screenshot2.png",
+    "description": "Complete guide to full-stack development using MERN stack for modern web applications."
+  },
+  {
+    "id": 13,
+    "title": "Python for Data Analysis",
+    "category": "Data Science",
+    "price": "Free",
+    "author": "Robert Taylor",
+    "duration": "16h",
+    "image": "/img/screenshot1.png",
+    "description": "Use Python libraries like Pandas and NumPy for data manipulation and analysis."
+  },
+  {
+    "id": 14,
+    "title": "Deep Learning with TensorFlow",
+    "category": "Data Science",
+    "price": "Paid",
+    "author": "Maria Rodriguez",
+    "duration": "28h",
+    "image": "/img/screenshot2.png",
+    "description": "Build neural networks and deep learning models using TensorFlow and Keras."
+  },
+  {
+    "id": 15,
+    "title": "Big Data Analytics",
+    "category": "Data Science",
+    "price": "Paid",
+    "author": "Kevin Chen",
+    "duration": "24h",
+    "image": "/img/screenshot1.png",
+    "description": "Handle large datasets with Hadoop, Spark, and advanced analytics techniques."
+  },
+  {
+    "id": 16,
+    "title": "Social Media Marketing",
+    "category": "Marketing",
+    "price": "Free",
+    "author": "Rachel Nguyen",
+    "duration": "9h",
+    "image": "/img/screenshot2.png",
+    "description": "Master social media platforms for brand promotion and audience engagement."
+  },
+  {
+    "id": 17,
+    "title": "Content Marketing Strategy",
+    "category": "Marketing",
+    "price": "Paid",
+    "author": "James Wilson",
+    "duration": "11h",
+    "image": "/img/screenshot1.png",
+    "description": "Create compelling content strategies to attract and retain customers."
+  },
+  {
+    "id": 18,
+    "title": "Email Marketing Mastery",
+    "category": "Marketing",
+    "price": "Paid",
+    "author": "Sophia Martinez",
+    "duration": "7h",
+    "image": "/img/screenshot2.png",
+    "description": "Design effective email campaigns and automate marketing workflows."
+  },
+  {
+    "id": 19,
+    "title": "Adobe Illustrator for Designers",
+    "category": "Design",
+    "price": "Paid",
+    "author": "Chris Anderson",
+    "duration": "13h",
+    "image": "/img/screenshot1.png",
+    "description": "Master vector graphics and illustration techniques with Adobe Illustrator."
+  },
+  {
+    "id": 20,
+    "title": "Motion Graphics with After Effects",
+    "category": "Design",
+    "price": "Paid",
+    "author": "Emma Thompson",
+    "duration": "19h",
+    "image": "/img/screenshot2.png",
+    "description": "Create stunning animations and visual effects for videos and presentations."
+  },
+  {
+    "id": 21,
+    "title": "Brand Identity Design",
+    "category": "Design",
+    "price": "Free",
+    "author": "Daniel Lee",
+    "duration": "6h",
+    "image": "/img/screenshot1.png",
+    "description": "Develop cohesive brand identities including logos, colors, and typography."
+  },
+  {
+    "id": 22,
+    "title": "Vue.js Fundamentals",
+    "category": "Web Development",
+    "price": "Free",
+    "author": "Nina Singh",
+    "duration": "12h",
+    "image": "/img/screenshot2.png",
+    "description": "Learn Vue.js from basics to building reactive web applications with components and routing."
+  },
+  {
+    "id": 23,
+    "title": "Data Visualization with D3.js",
+    "category": "Data Science",
+    "price": "Paid",
+    "author": "Paul Harris",
+    "duration": "15h",
+    "image": "/img/screenshot1.png",
+    "description": "Create interactive data visualizations using D3.js library for web-based dashboards."
+  },
+  {
+    "id": 24,
+    "title": "Google Ads Certification Prep",
+    "category": "Marketing",
+    "price": "Paid",
+    "author": "Laura Kim",
+    "duration": "10h",
+    "image": "/img/screenshot2.png",
+    "description": "Prepare for Google Ads certification with comprehensive training on PPC campaigns and optimization."
+  }
+]

@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fonts */
+:root {
+  --primary: #1C6048;
+  --secondary: #090E0D;
+  --accent: #C7411A;
+  --pastel1: #EDE2E5;
+  --pastel2: #B0A7AC;
+  --pastel3: #A8B2D2;
+  --pastel4: #B9C7EB;
+  --neutral: #978C74;
+  --muted: #6b7280;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.dark body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+
+  /* Force all text to white in dark mode */
+  * {
+    color: #ffffff !important;
+  }
+}
+
+.dark img {
+  filter: brightness(0.8);
+}
+
+.dark section,
+.dark div,
+.dark main {
+  background-color: #000000 !important;
+}
+
+/* Cards and common */
+.card {
+  @apply bg-white rounded-2xl shadow-lg p-6 border border-pastel3 hover:shadow-xl transition-shadow;
+  color: #000000;
+}
+
+.dark .card {
+  @apply bg-gray-800 border-gray-700 shadow-none;
+  color: #ffffff;
+}
+
+.text-black {
+  color: #000000;
+}
+
+.dark .text-black {
+  color: #ffffff !important;
+}
+
+.soft-pill {
+  @apply inline-block bg-pastel1 px-3 py-1 rounded-full text-sm font-medium text-secondary;
+}
+
+.dark .soft-pill {
+  @apply bg-gray-700 text-gray-300;
+}
+
+/* Utilities */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1600px;
+  }
+}

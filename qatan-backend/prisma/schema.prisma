@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       Int              @id @default(autoincrement())
+  name                     String
+  email                    String           @unique
+  password                 String
+  role                     String // 'student' | 'instructor' | 'admin'
+  discordId                String? // Discord user ID
+  discordChannelLink       String? // Link to their private Discord course room
+  status                   String?          @default("active") // 'active' | 'suspended' | 'inactive'
+  verificationCode         String? // 6-digit verification code
+  verificationCodeExpires  DateTime? // When the code expires
+  verificationCodeAttempts Int              @default(0) // Number of failed attempts
+  isVerified               Boolean          @default(false) // Email verification status
+  emailVerifiedAt          DateTime? // When email was verified
+   profilePicture           String? // Cloudinary URL for profile picture
+  bio                      String? // Short bio for the user
+  createdAt                DateTime         @default(now())
+  googleId                 String?
+  gmailEmail               String?
+  gmailRefreshToken        String?
+  courses                  Course[]         @relation("InstructorCourses")
+  CourseCompletion         CourseCompletion[]
+  enrollments              Enrollment[]
+  quizzes                  Quiz[]           @relation("InstructorQuizzes")
+  progress                 Progress[]
+  contactMessages          ContactMessage[]
+  transactions             Transaction[]
+    quizAttempts             QuizAttempt[]
+}
+
+model Course {
+  id             Int           @id @default(autoincrement())
+  title          String
+  description    String
+  price          Float?
+  category       String? // Course category: 'Design' | 'Development' | 'Marketing' | 'Business'
+  visibility     String        @default("Public") // 'Public' | 'Private'
+  instructor     User          @relation("InstructorCourses", fields: [instructorId], references: [id])
+  instructorId   Int
+  discordChannel String?
+  status         String        @default("draft") // 'draft' | 'pending_approval' | 'published' | 'rejected'
+  rejectedAt     DateTime? // Track when course was rejected
+  thumbnailUrl   String? // Cloudinary URL for course thumbnail
+  videoUrls      Json? // Array of Cloudinary URLs for course videos
+  createdAt      DateTime      @default(now())
+  enrollments    Enrollment[]
+  quizzes        Quiz[]
+  modules        Module[]
+  transactions   Transaction[]
+  CourseCompletion         CourseCompletion[]
+}
+
+model Enrollment {
+  id         Int      @id @default(autoincrement())
+  student    User     @relation(fields: [studentId], references: [id])
+  studentId  Int
+  course     Course   @relation(fields: [courseId], references: [id])
+  courseId   Int
+  status     String   @default("pending")
+  paymentRef String?
+  createdAt  DateTime @default(now())
+}
+
+model Quiz {
+  id           Int      @id @default(autoincrement())
+  title        String
+  questions    Json
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId     Int
+  instructor   User     @relation("InstructorQuizzes", fields: [instructorId], references: [id])
+  instructorId Int
+  module       Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId     Int? 
+  timeLimit    Int?
+  attempts     QuizAttempt[]
+  createdAt    DateTime @default(now()) 
+}
+
+model InstructorApplication {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String
+  status      String    @default("pending") // 'pending' | 'approved' | 'rejected'
+  passkey     String? // Generated passkey for approved instructors
+  appliedAt   DateTime  @default(now())
+  processedAt DateTime?
+}
+
+model Module {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  order       Int      @default(0) // Order within the course
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    Int
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lesson {
+  id          Int        @id @default(autoincrement())
+  title       String
+  content     String? // For text content
+  contentType String     @default("text") // 'text' | 'video' | 'image' | 'quiz'
+  mediaUrl    String? // Cloudinary URL for video/image content
+  order       Int        @default(0) // Order within the module
+  duration    Int? // Duration in minutes (for videos)
+  module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId    Int
+  progress    Progress[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Progress {
+  id          Int       @id @default(autoincrement())
+  student     User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId   Int
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    Int
+  status      String    @default("not_started") // 'not_started' | 'in_progress' | 'completed'
+  progress    Float     @default(0) // Percentage completed (0-100)
+  timeSpent   Int       @default(0) // Time spent in seconds
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([studentId, lessonId])
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@map("contact_messages")
+}
+
+model QuizAttempt {
+  id          Int      @id @default(autoincrement())
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId   Int
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId      Int
+  score       Int      // Score achieved (0-100)
+  answers     Json     // User's answers
+  completedAt DateTime @default(now())
+ status      String?  @db.VarChar
+
+  @@unique([studentId, quizId])
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  courseId  Int
+  amount    Float
+  status    String   @default("pending") // 'pending' | 'completed' | 'failed'
+  tx_ref    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+model PlatformSettings {
+  id             Int      @id @default(autoincrement())
+  siteName       String   @default("Qatan E-Learning")
+  defaultLanguage String  @default("English")
+  supportEmail    String  @default("Qatanlearning@gmail.com")
+  chapaEnabled   Boolean  @default(true)
+  chapaPublicKey String?
+  chapaSecretKey String?
+  createdAt      DateTime @default(now())
+updatedAt      DateTime @updatedAt @default(now())
+
+}
+
+model CourseCompletion {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  courseId    Int
+  completedAt DateTime @default(now())
+  Course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  User        User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+}

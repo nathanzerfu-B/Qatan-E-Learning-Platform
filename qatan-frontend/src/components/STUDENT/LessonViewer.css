@@ -1,0 +1,430 @@
+/* lessonViewer.css - Plain CSS equivalents for the Lesson Viewer component
+	 This file mirrors the Tailwind-based layout and visual styles used in the original component.
+	 Keep selectors specific to avoid interfering with other app styles.
+*/
+
+/* Global page background for light theme */
+html, body {
+	background-color: #f9fafb;
+	color: #111827;
+}
+
+/* Dark mode styles */
+body.student-dark {
+	color: #ffffff;
+}
+
+body.student-dark .lv-page {
+	background-color: #1a1a1a !important;
+	color: #ffffff !important;
+}
+
+body.student-dark .lv-panel,
+body.student-dark .lv-media-wrap,
+body.student-dark .lv-placeholder,
+body.student-dark .outline-list,
+body.student-dark .outline-module,
+body.student-dark .lv-resume-card,
+body.student-dark .lv-next-card,
+body.student-dark .resource-card {
+	background-color: hsla(240, 3%, 6%, 0.685) !important;
+	color: #f9fafb;
+}
+
+body.student-dark .material-icons,
+body.student-dark p,
+body.student-dark span,
+body.student-dark .module-title,
+body.student-dark .module-sub,
+body.student-dark .lv-title,
+body.student-dark .lv-heading,
+body.student-dark .lv-strong,
+body.student-dark .lv-small,
+body.student-dark .lv-muted {
+	color: #ffffff;
+}
+
+body.student-dark .lv-resume-icon,
+body.student-dark .lv-next-icon {
+	color: #d1d5db;
+}
+
+body.student-dark .lv-progress-track {
+	background-color: #4b5563;
+}
+
+body.student-dark .lv-progress-fill {
+	background-color: #3b82f6;
+}
+
+body.student-dark .lv-primary-btn {
+	background-color: #3b82f6;
+	color: #ffffff;
+}
+
+body.student-dark .lv-link-btn {
+	color: #3b82f6;
+}
+
+body.student-dark .lv-link-btn:hover {
+	color: #60a5fa;
+}
+
+body.student-dark .module-quiz-available {
+	background-color: #3b82f6;
+	color: #ffffff;
+}
+
+body.student-dark .module-quiz-failed {
+	background-color: #ef4444;
+	color: #ffffff;
+}
+
+body.student-dark .lesson-clickable:hover {
+	color: #3b82f6;
+}
+
+body.student-dark .lesson-completed,
+body.student-dark .lesson-rewatch,
+body.student-dark .lesson-complete-btn {
+	color: #3b82f6;
+}
+
+body.student-dark .lesson-rewatch:hover,
+body.student-dark .lesson-complete-btn:hover {
+	text-decoration: underline;
+	color: #60a5fa;
+}
+
+body.student-dark .outline-module {
+	border: 1px solid #4b5563;
+}
+
+body.student-dark .quiz-modal {
+	background-color: #000000;
+	color: #ffffff;
+}
+
+body.student-dark .quiz-submit {
+	background-color: #10b981;
+}
+
+/* Card / container */
+.lv-media-wrap {
+	position: relative;
+	background-color: #ffffff; /* white card background for light theme */
+	border-radius: 0.5rem; /* rounded-lg */
+	width: 100%;
+	max-width: 650px; /* make the card a fixed readable width inside the panel */
+	margin: 0 auto; /* center the card inside the panel */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* allow video to show full letterbox/pillarbox rather than cropping */
+	overflow: visible;
+	padding: 1rem;
+}
+
+/* Placeholder when no lesson */
+.lv-placeholder {
+	position: relative;
+	background-color: #ffffff; /* placeholder uses white card background */
+	height: 400px;
+	width: 100%;
+	max-width: 600px; /* keep a reasonable max width */
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 0.5rem;
+	margin: 0 auto; /* ensure placeholder centers inside its container */
+}
+.lv-placeholder-btn {
+	width: 6rem; /* w-24 */
+	height: 6rem; /* h-24 */
+	background-color: #f3f4f6; /* subtle light button on white card */
+	border-radius: 9999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+}
+.lv-placeholder-icon {
+	color: #111827; /* dark icon color for contrast */
+	font-size: 3.75rem; /* text-6xl ~ 3.75rem */
+}
+
+/* Media common styles (video / image) */
+.lv-media {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	/* let the video/image preserve its intrinsic aspect ratio and fit inside the available
+	   container without cropping */
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	max-height: 60vh; /* increased size to make video controls more usable */
+	object-fit: contain; /* show entire video with letterboxing/pillarboxing as needed */
+	background-color: #000; /* keep media background black so video content remains natural */
+	align-self: center;
+}
+
+/* Ensure media sits below overlay controls */
+.lv-media { position: relative; z-index: 0; }
+
+/* Fullscreen rules: when the video element enters fullscreen, ensure it shows the full frame */
+.lv-media:fullscreen,
+.lv-media:-webkit-full-screen,
+.lv-media:-moz-full-screen,
+.lv-media:-ms-fullscreen {
+	width: 100vw !important;
+	height: 100vh !important;
+	max-width: none !important;
+	max-height: none !important;
+	object-fit: contain !important; /* preserve aspect ratio and show entire video */
+}
+
+/* Also ensure parent container doesn't clip when child is fullscreen */
+.lv-media-wrap:fullscreen,
+.lv-media-wrap:-webkit-full-screen,
+.lv-media-wrap:-moz-full-screen,
+.lv-media-wrap:-ms-fullscreen {
+	overflow: visible;
+}
+.img-contain {
+	object-fit: contain;
+	background-color: transparent;
+	/* Images also respect natural proportions */
+	width: 100%;
+	height: auto;
+	max-height: 80vh;
+}
+
+.lv-media-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.lv-media-empty-text {
+	color: #111827; /* dark text for visibility on white card */
+}
+
+/* Next lesson button */
+.lv-next-lesson {
+	bottom: 1rem; /* bottom-4 */
+	right: 1rem; /* right-4 */
+	background-color: #111827; /* dark circular button to contrast white cards */
+	color: #ffffff;
+	padding: 0.5rem; /* p-2 */
+	border-radius: 9999px;
+	border: none;
+	cursor: pointer;
+	transition: background-color 150ms ease-in-out, opacity 150ms ease-in-out;
+	z-index: 10;
+}
+.lv-next-lesson:hover { background-color: #0b1220; }
+.lv-absolute { position: absolute; }
+.lv-fixed { position: fixed; }
+
+/* Back to Courses button shown inside the media card */
+.lv-back-to-courses {
+	position: relative;
+	background: rgba(59, 130, 246, 0.8);
+	color: #ffffff;
+	border: 1px solid rgba(59,130,246,0.2);
+	padding: 0.45rem 0.75rem;
+	border-radius: 0.375rem;
+	cursor: pointer;
+	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	box-shadow: 0 6px 18px rgba(59,130,246,0.12);
+	backdrop-filter: blur(4px);
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	align-self: center;
+}
+
+body.student-dark .lv-back-to-courses {
+	background: rgba(59, 130, 246, 0.8);
+	color: #ffffff;
+	border-color: rgba(59,130,246,0.3);
+	box-shadow: 0 6px 18px rgba(59,130,246,0.24);
+}
+
+.lv-back-to-courses:focus {
+	outline: 2px solid rgba(59,130,246,0.35);
+	outline-offset: 2px;
+}
+
+/* Course outline */
+.outline-list { display: block; gap: 0.5rem; background-color: #ffffff; padding: 1rem; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.outline-module {
+	background-color: #f9fafb; /* surface light */
+	border-radius: 0.5rem;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+	margin-bottom: 0.5rem;
+}
+.module-header { display: flex; }
+.module-toggle {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	padding: 1rem; /* p-4 */
+	text-align: left;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}
+.module-info { flex: 1; }
+.module-title { font-weight: 500; margin: 0; }
+.module-sub { margin: 0; font-size: 0.875rem; color: #6b7280; }
+.module-passed { color: #10b981; font-size: 0.875rem; margin-right: 0.5rem; white-space: nowrap; }
+.module-expand { transform-origin: center; }
+
+.module-lessons { padding-left: 2rem; padding-top: 0.5rem; padding-bottom: 0.5rem; display: block; gap: 0.25rem; }
+.module-quiz { font-size: 0.875rem; padding: 0.25rem 0.75rem; border-radius: 0.375rem; margin-top: 0.5rem; }
+.module-quiz-available { background-color: #2563eb; color: #ffffff; }
+.module-quiz-failed { background-color: #ef4444; color: #ffffff; }
+
+/* Lesson item */
+.lesson-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.875rem;
+	padding: 0.25rem 1.9rem 0.25rem 0;
+
+	border-radius: 0.25rem;
+	margin-bottom: 0.5rem;
+}
+.lesson-locked { opacity: 0.5; cursor: not-allowed; }
+.lesson-name { display: inline-block; }
+.lesson-clickable { cursor: pointer; }
+.lesson-clickable:hover { color: #2563eb; }
+
+.lesson-actions { display: flex; align-items: center; gap: 0.75rem; }
+.lesson-status { color: #6b7280; }
+.lesson-completed { color: #2563eb; }
+.lesson-rewatch { color: #2563eb; font-size: 0.75rem; background: none; border: none; padding: 0; cursor: pointer; }
+.lesson-rewatch:hover { text-decoration: underline; }
+.lesson-complete-btn { color: #2563eb; font-size: 0.75rem; background: none; border: none; padding: 0; cursor: pointer; margin-left: 1rem; }
+.lesson-complete-btn:hover { text-decoration: underline; }
+
+/* Quiz modal */
+.quiz-overlay {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0,0,0,0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 50;
+}
+.quiz-modal {
+	background-color: #ffffff;
+	color: #111827;
+	padding: 1.5rem;
+	border-radius: 0.5rem;
+	max-width: 42rem;
+	width: 100%;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+.quiz-modal-result { max-width: 28rem; text-align: center; }
+.quiz-title { font-size: 1.125rem; font-weight: 700; margin: 0 0 0.75rem 0; }
+.quiz-result-body { margin-bottom: 0.75rem; }
+.quiz-passfail { font-size: 1.5rem; font-weight: 700; margin: 0; }
+.quiz-pass { color: #10b981; }
+.quiz-fail { color: #ef4444; }
+.quiz-score { margin: 0.5rem 0; }
+.quiz-message { margin: 0; }
+
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.quiz-timer { color: #ef4444; font-weight: 600; }
+.quiz-body { display: block; gap: 1rem; }
+.quiz-question { border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; margin-bottom: 1rem; }
+.quiz-question-title { font-weight: 500; margin: 0 0 0.5rem 0; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.25rem; }
+.quiz-option { display: flex; align-items: center; gap: 0.5rem; }
+.quiz-option-text { display: inline-block; }
+.quiz-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+.quiz-submit { background-color: #2563eb; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; }
+
+/* Small responsive tweaks */
+@media (max-width: 640px) {
+	.lv-media { height: 300px; }
+	.lv-placeholder { height: 260px; max-width: 100%; }
+}
+
+/* Page-level */
+.lv-page { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background-color: #f9fafb !important; color: #111827 !important; min-height: 100vh; }
+.lv-page-inner { max-width: none; width: 100%; margin: 0; }
+.lv-main { padding: 1rem; }
+.lv-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+.lv-panel {
+	width: 100%; /* fill available content area (so card can center inside it) */
+	max-width: none;
+	background-color: #ffffff !important;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	box-shadow: 0 6px 10px rgba(0,0,0,0.04);
+	margin-bottom: 1rem;
+	padding: 0; /* keep children spacing inside panel-body */
+	box-sizing: border-box;
+}
+.lv-panel > .lv-card {
+	/* explicitly center the media card inside the panel without affecting panel layout */
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+.lv-panel-body { padding: 1rem; }
+.lv-panel-heading { font-size: 1.125rem; font-weight: 600; margin: 0 0 0.25rem 0; }
+.lv-muted { color: #6b7280; }
+.lv-section-gap { margin-top: 1rem; }
+.lv-flex-between { display: flex; justify-content: space-between; align-items: center; }
+.lv-small { font-size: 0.875rem; }
+.lv-progress-track { width: 100%; background-color: #e5e7eb; border-radius: 9999px; height: 0.5rem; }
+.lv-progress-fill { height: 0.5rem; background-color: #2563eb; border-radius: 9999px; }
+
+/* Resume card */
+.lv-section { margin-top: 1.5rem; }
+.lv-heading { font-weight: 600; margin-bottom: 0.5rem; color: #111827; }
+.lv-resume-card { background-color: #ffffff; border-radius: 0.5rem; padding: 1rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.lv-resume-left { display: flex; align-items: center; gap: 0.75rem; }
+.lv-resume-icon { color: #6b7280; margin-right: 0.5rem; }
+.lv-strong { font-weight: 500; margin: 0; }
+.lv-primary-btn { background-color: #2563eb; color: #ffffff; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 600; }
+.lv-primary-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Next lesson card */
+.lv-next-card { background-color: #ffffff; border-radius: 0.5rem; padding: 1rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.lv-next-left { display: flex; align-items: center; gap: 0.75rem; }
+.lv-next-icon { color: #6b7280; }
+.lv-link-btn { color: #2563eb; font-size: 0.875rem; font-weight: 600; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem; }
+.lv-link-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.lv-link-icon { font-size: 0.875rem; margin-left: 0.25rem; }
+
+/* Resources */
+.lv-resources { display: flex; flex-direction: column; gap: 0.5rem; }
+.resource-card { background-color: #ffffff; border-radius: 0.5rem; padding: 1rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.resource-left { display: flex; align-items: center; gap: 0.75rem; }
+.resource-icon { padding: 0.5rem; border-radius: 9999px; margin-right: 0.5rem; }
+.resource-icon-red { background-color: #fee2e2; }
+.resource-icon-blue { background-color: #dbeafe; }
+.resource-icon-purple { background-color: #f3e8ff; }
+.resource-icon-inner { color: #ef4444; }
+.resource-icon-blue .resource-icon-inner { color: #3b82f6; }
+.resource-icon-purple .resource-icon-inner { color: #7c3aed; }
+.resource-title { font-weight: 500; margin: 0; }
+.resource-sub { margin: 0; font-size: 0.875rem; color: #6b7280; }
+.resource-link { color: #6b7280; }
+
+
+
+
+
+

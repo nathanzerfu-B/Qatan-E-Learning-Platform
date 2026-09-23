@@ -1,0 +1,2 @@
+- [x] Modify AdminReports.jsx to split Enrollment Report Preview into two columns: left for course info (Title, Instructor, Status, Created Date), right for stats (Enrollments, Rating, Completion Rate, Revenue) and Enrolled Students table.
+- Modify AdminReports.jsx to split Student Performance Report Preview into two columns: left for student info (Name, Email, Status, Join Date, Last Login), right for stats (Enrollments, Completed), and Course Activities table full width below.

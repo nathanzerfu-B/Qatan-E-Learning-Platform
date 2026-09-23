@@ -1,0 +1,1007 @@
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import "./LessonViewer.css";
+
+function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
+  const videoRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (status === "in-progress" && videoRef.current) {
+      videoRef.current.play();
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      const handleFullscreenChange = () => {
+        setIsFullscreen(!!document.fullscreenElement);
+      };
+      video.addEventListener("fullscreenchange", handleFullscreenChange);
+      return () => {
+        video.removeEventListener("fullscreenchange", handleFullscreenChange);
+      };
+    }
+  }, []);
+
+  const handleComplete = () => {
+    onComplete();
+  };
+
+  if (!lesson) {
+    // When no lesson is selected, still render the media wrapper.
+    return (
+      <div className="lv-media-wrap">
+        <div className="lv-placeholder">
+          <button className="lv-placeholder-btn" disabled>
+            <span className="material-icons lv-placeholder-icon">code</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const mediaSrc = lesson.mediaSrc;
+  const ext = mediaSrc.split(".").pop().toLowerCase();
+
+  let mediaElement;
+  if (ext === "mp4") {
+    mediaElement = (
+      <video
+        ref={videoRef}
+        src={mediaSrc}
+        className="lv-media"
+        controls={true}
+        autoPlay
+        onEnded={handleComplete}
+      />
+    );
+  } else if (ext === "jpg" || ext === "png") {
+    mediaElement = (
+      <img
+        src={mediaSrc}
+        alt={lesson.name}
+        className="lv-media img-contain"
+        onLoad={() => handleComplete()} // Assume image viewing completes immediately
+      />
+    );
+  } else {
+    // Remove document support, show message instead
+    mediaElement = (
+      <div className="lv-media lv-media-empty">
+        <p className="lv-media-empty-text">
+          Document viewing is not supported. Please use video or image lessons
+          only.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="lv-media-wrap">
+      {mediaElement}
+      {status === "completed" && ext === "mp4" && (
+        <button
+          onClick={onNextLesson}
+          className={`lv-next-lesson ${
+            isFullscreen ? "lv-fixed" : "lv-absolute"
+          }`}
+          title="Next Lesson"
+        >
+          <span className="material-icons">skip_next</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function CourseOutline({
+  modules,
+  onLessonStart,
+  onLessonComplete,
+  onQuizStart,
+}) {
+  const [expandedModules, setExpandedModules] = useState({});
+
+  const toggleModule = (moduleId) => {
+    setExpandedModules((prev) => ({
+      ...prev,
+      [moduleId]: !prev[moduleId],
+    }));
+  };
+
+  return (
+    <div className="outline-list">
+      {modules.map((module) => (
+        <div key={module.id} className="outline-module">
+          <div className="module-header">
+            <button
+              type="button"
+              className="module-toggle"
+              onClick={() => toggleModule(module.id)}
+            >
+              <div className="module-info">
+                <p className="module-title">{module.name}</p>
+                <p className="module-sub">
+                  {module.completedLessons}/{module.totalLessons} Lessons
+                </p>
+              </div>
+              {module.quizStatus === "passed" && (
+                <span className="module-passed">Quiz Passed</span>
+              )}
+              <span className="material-icons module-expand">
+                {expandedModules[module.id] ? "expand_less" : "expand_more"}
+              </span>
+            </button>
+          </div>
+          {expandedModules[module.id] && (
+            <div className="module-lessons">
+              {module.lessons.map((lesson) => (
+                <LessonItem
+                  key={lesson.id}
+                  lesson={lesson}
+                  onStart={onLessonStart}
+                  onComplete={onLessonComplete}
+                />
+              ))}
+              {!module.locked &&
+                (module.quizStatus === "available" ||
+                  module.quizStatus === "failed") && (
+                  <button
+                    type="button"
+                    className={`module-quiz ${
+                      module.quizStatus === "failed"
+                        ? "module-quiz-failed"
+                        : "module-quiz-available"
+                    }`}
+                    onClick={() => onQuizStart(module.id)}
+                  >
+                    {module.quizStatus === "failed"
+                      ? "Retake Quiz"
+                      : "Take Quiz"}
+                  </button>
+                )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LessonItem({ lesson, onStart, onComplete }) {
+  const { name, status, locked } = lesson;
+
+  const handleStart = () => {
+    if (!locked) {
+      onStart(lesson);
+    }
+  };
+
+  const handleComplete = () => {
+    if (!locked) {
+      onComplete(lesson);
+    }
+  };
+
+  return (
+    <div className={`lesson-item ${locked ? "lesson-locked" : ""}`}>
+      <span
+        className={`lesson-name ${
+          !locked && status !== "completed" ? "lesson-clickable" : ""
+        }`}
+        onClick={!locked && status !== "completed" ? handleStart : undefined}
+      >
+        {locked ? "🔒 " : ""}
+        {name}
+      </span>
+      <div className="lesson-actions">
+        <span
+          className={`lesson-status ${
+            status === "completed" ? "lesson-completed" : "lesson-notstarted"
+          }`}
+        >
+          {status === "completed" ? (
+            <button
+              onClick={handleStart}
+              className="lesson-rewatch"
+              title="Rewatch"
+            >
+              ▶️ Rewatch
+            </button>
+          ) : status === "in-progress" ? (
+            "In Progress"
+          ) : (
+            "Not Started"
+          )}
+        </span>
+        {status === "in-progress" && (
+          <button onClick={handleComplete} className="lesson-complete-btn">
+            Complete
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function QuizModal({ moduleId, onClose, onResult }) {
+  if (!moduleId) {
+    // Defensive: do not fetch or render if invalid moduleId
+    console.warn("QuizModal: invalid moduleId, skipping fetch");
+    return null;
+  }
+
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(null); // Initialize as null to set after fetch
+  const [submitted, setSubmitted] = useState(false);
+  const [passed, setPassed] = useState(null);
+  const [score, setScore] = useState(0);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState(0); // new state for total questions count
+
+  useEffect(() => {
+    // Fetch quiz questions from backend
+    const fetchQuiz = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:5000/api/quizzes/module/${moduleId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+          if (response.data.success && response.data.quiz) {
+            const quiz = response.data.quiz;
+            // Log raw quiz questions for debugging
+            console.log("Fetched quiz questions:", quiz.questions);
+            // Use all questions without limiting to 5
+            const allQuestions = quiz.questions || [];
+            console.log("All questions count:", allQuestions.length); // added debug log
+            // Optionally shuffle all questions, but do not limit to 5
+            const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+            setQuestions(shuffled);
+            setTotalQuestions(shuffled.length); // set total questions count to shuffled length to avoid mismatch
+            // Set timeLeft from quiz timeLimit or default to 60 seconds
+setTimeLeft(quiz.timeLimit ? quiz.timeLimit * 60 : 60);
+          } else {
+            setQuestions([]);
+            setTotalQuestions(0);
+            setTimeLeft(60);
+          }
+      } catch (error) {
+        console.error("Error fetching quiz:", error);
+        setQuestions([]);
+        setTotalQuestions(0);
+        setTimeLeft(60);
+      }
+    };
+    fetchQuiz();
+  }, [moduleId]);
+
+  const handleAnswerChange = (questionId, answer) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
+
+  const handleSubmit = useCallback(async () => {
+    setSubmitted(true);
+    // Ensure all questions have been answered, else treat unanswered as incorrect
+    const correctCount = questions.filter((q) => {
+      if (answers[q.id] === undefined || answers[q.id] === "") return false;
+      // Handle different question types
+      if (q.type === "multiple-choice") {
+        // Convert both to string for comparison to avoid type mismatch
+        return String(answers[q.id]) === String(q.answer);
+      } else {
+        // For fill-blank and short-answer, q.answer is the text answer
+        return (
+          answers[q.id].toLowerCase().trim() === q.answer.toLowerCase().trim()
+        );
+      }
+    }).length;
+    const calculatedScore = (correctCount / questions.length) * 100;
+    // Pass if score >= 40%
+    const didPass = calculatedScore >= 40;
+    setPassed(didPass);
+    setScore(calculatedScore);
+    setCorrectAnswersCount(correctCount);
+
+    // Submit quiz attempt to backend
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:5000/api/quizzes/module/${moduleId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success && response.data.quiz) {
+        const quizId = response.data.quiz.id;
+
+        // Submit the quiz attempt
+        await axios.post(
+          "http://localhost:5000/api/quizzes/submit",
+          {
+            quizId: quizId,
+            answers: answers,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("Quiz attempt saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving quiz attempt:", error);
+    }
+
+    onResult(didPass);
+  }, [questions, answers, onResult, moduleId]);
+
+  useEffect(() => {
+    if (timeLeft > 0 && !submitted) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && !submitted) {
+      handleSubmit();
+    }
+  }, [timeLeft, submitted, handleSubmit]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitted, onClose]);
+
+  if (submitted) {
+    return (
+      <div className="quiz-overlay">
+        <div className="quiz-modal quiz-modal-result">
+          <h2 className="quiz-title">Quiz Result</h2>
+          <div className="quiz-result-body">
+            <p
+              className={`quiz-passfail ${passed ? "quiz-pass" : "quiz-fail"}`}
+            >
+              {passed ? "PASS" : "FAIL"}
+            </p>
+          <p className="quiz-score">
+            Score: {correctAnswersCount}/{totalQuestions} ({score.toFixed(0)}%)
+          </p>
+          </div>
+          <p className="quiz-message">
+            {passed
+              ? "Congratulations! You have Passed."
+              : "You need at least 40% to pass. Please review the module and try again."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="quiz-overlay">
+      <div className="quiz-modal">
+        <div className="quiz-header">
+          <h2 className="quiz-title">Module {moduleId} Quiz</h2>
+          <div className="quiz-timer">Time: {formatTime(timeLeft)}</div>
+        </div>
+        <div className="quiz-body">
+          {questions.map((q, index) => (
+            <div key={q.id} className="quiz-question">
+              <p className="quiz-question-title">
+                {index + 1}. {q.question}
+              </p>
+              {q.type === "multiple-choice" ? (
+                <div className="quiz-options">
+                  {q.options.map((option, i) => (
+                    <label key={i} className="quiz-option">
+                      <input
+                        type="radio"
+                        name={`question-${q.id}`}
+                        value={i}
+                        checked={answers[q.id] === i}
+                        onChange={() => handleAnswerChange(q.id, i)}
+                      />
+                      <span className="quiz-option-text">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <div className="quiz-text-input">
+                  <input
+                    type="text"
+                    value={answers[q.id] || ""}
+                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                    placeholder="Enter your answer"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      backgroundColor: "white",
+                      color: "#333",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="quiz-actions">
+          <button onClick={handleSubmit} className="quiz-submit">
+            Submit Quiz
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  // Dark mode is handled globally by AuthContext, no need for local override
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const courseId = location.state?.courseId;
+        if (!courseId) {
+          setError("No course selected");
+          setLoading(false);
+          return;
+        }
+
+        const token = localStorage.getItem("token");
+        const courseResponse = await axios.get(
+          `http://localhost:5000/api/courses/${courseId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (courseResponse.data.success) {
+          setCourse(courseResponse.data.course);
+
+          // Fetch progress
+          const progressResponse = await axios.get(
+            `http://localhost:5000/api/progress/course/${courseId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (progressResponse.data.success) {
+            const progressData = progressResponse.data.progress;
+
+            // Fetch quiz statuses for all modules
+            const modulesWithQuizStatus = await Promise.all(
+              courseResponse.data.course.modules.map(async (module) => {
+                const moduleProgress = progressData.modules.find(
+                  (m) => m.module.id === module.id
+                );
+
+                // Check if student has passed the quiz for this module
+                let quizStatus = "available";
+                try {
+                  const quizResponse = await axios.get(
+                    `http://localhost:5000/api/quizzes/module/${module.id}`,
+                    {
+                      headers: { Authorization: `Bearer ${token}` },
+                    }
+                  );
+
+                  if (quizResponse.data.success && quizResponse.data.quiz) {
+                    const quizId = quizResponse.data.quiz.id;
+
+                    // Check if student has an attempt for this quiz via the new API
+                    const attemptResponse = await axios.get(
+                      `http://localhost:5000/api/quizzes/${quizId}/student-attempt`,
+                      {
+                        headers: { Authorization: `Bearer ${token}` },
+                      }
+                    );
+
+                    if (attemptResponse.data.success) {
+                      const attempt = attemptResponse.data.attempt;
+                      if (!attempt) {
+                        quizStatus = "available";
+                      } else if (attempt.status === "passed") {
+                        quizStatus = "passed";
+                      } else if (attempt.status === "failed") {
+                        quizStatus = "failed";
+                      } else {
+                        // fallback
+                        quizStatus = "available";
+                      }
+                    } else {
+                      quizStatus = "available";
+                    }
+                  }
+                } catch (error) {
+                  console.error(
+                    `Error fetching quiz status for module ${module.id}:`,
+                    error
+                  );
+                }
+
+                return {
+                  id: module.id,
+                  name: module.title,
+                  totalLessons: module.lessons.length,
+                  completedLessons: moduleProgress
+                    ? moduleProgress.completedCount
+                    : 0,
+                  quizStatus: quizStatus,
+                  locked: false, // TODO: Implement locking logic
+                  lessons: module.lessons.map((lesson) => {
+                    const lessonProgress = moduleProgress?.lessons.find(
+                      (l) => l.id === lesson.id
+                    )?.progress;
+                    return {
+                      id: lesson.id,
+                      name: lesson.title,
+                      moduleName: module.title,
+                      moduleId: module.id,
+                      status: lessonProgress
+                        ? lessonProgress.status
+                        : "not-started",
+                      locked: false, // TODO: Implement locking
+                      mediaSrc: lesson.mediaUrl || "/img/default-lesson.png",
+                    };
+                  }),
+                };
+              })
+            );
+            console.debug("Modules with quiz status fetched:", modulesWithQuizStatus);
+            setModules(modulesWithQuizStatus);
+          }
+        } else {
+          setError("Course not found");
+        }
+      } catch (err) {
+        console.error("Error fetching course data:", err);
+        setError("Failed to load course data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [location.state]);
+
+  // Set initial state for first time user with no course taken
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [lessonStatus, setLessonStatus] = useState("not-started");
+  const [overallProgress, setOverallProgress] = useState(0); // 0% progress for first time user
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [currentQuizModule, setCurrentQuizModule] = useState(null);
+
+  const handleLessonStart = async (lesson) => {
+    if (!lesson.locked) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.put(
+          `http://localhost:5000/api/progress/lesson/${lesson.id}`,
+          {
+            status: "in_progress",
+            progress: 0,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setCurrentLesson(lesson);
+        setLessonStatus("in-progress");
+        updateLessonStatus(lesson.id, "in-progress");
+      } catch (error) {
+        console.error("Error updating progress:", error);
+      }
+    }
+  };
+
+  const handleLessonComplete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:5000/api/progress/lesson/${currentLesson.id}`,
+        {
+          status: "completed",
+          progress: 100,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setLessonStatus("completed");
+      updateLessonStatus(currentLesson.id, "completed");
+      unlockNextLesson(currentLesson.id);
+      updateProgress();
+      checkModuleCompletion(currentLesson.id);
+    } catch (error) {
+      console.error("Error updating progress:", error);
+    }
+  };
+
+  const handleLessonResume = () => {
+    setLessonStatus("in-progress");
+    updateLessonStatus(currentLesson.id, "in-progress");
+  };
+
+  const handleLessonStop = () => {
+    setLessonStatus("paused");
+    updateLessonStatus(currentLesson.id, "in-progress"); // Keep as in-progress but paused
+  };
+
+  const handleNextLesson = () => {
+    const nextLessonId = currentLesson.id + 1;
+    const nextLesson = modules
+      .flatMap((m) => m.lessons)
+      .find((l) => l.id === nextLessonId);
+    if (nextLesson && !nextLesson.locked) {
+      handleLessonStart(nextLesson);
+    }
+  };
+
+  const updateLessonStatus = (lessonId, status) => {
+    setModules((prevModules) =>
+      prevModules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) =>
+          lesson.id === lessonId ? { ...lesson, status } : lesson
+        ),
+      }))
+    );
+  };
+
+  const unlockNextLesson = (completedLessonId) => {
+    setModules((prevModules) =>
+      prevModules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) => {
+          if (
+            lesson.id === completedLessonId + 1 &&
+            lesson.locked &&
+            !module.locked
+          ) {
+            return { ...lesson, locked: false };
+          }
+          return lesson;
+        }),
+      }))
+    );
+  };
+
+  const updateProgress = () => {
+    const totalLessons = modules.reduce(
+      (sum, module) => sum + module.totalLessons,
+      0
+    );
+    const completedLessons =
+      modules.reduce((sum, module) => sum + module.completedLessons, 0) + 1; // +1 for just completed
+    const progress = Math.round((completedLessons / totalLessons) * 100);
+    setOverallProgress(progress);
+
+    setModules((prevModules) =>
+      prevModules.map((module) => ({
+        ...module,
+        completedLessons: module.lessons.filter((l) => l.status === "completed")
+          .length,
+      }))
+    );
+  };
+
+  const checkModuleCompletion = () => {
+    // Module completion logic if needed, but quiz availability is now handled on module unlock
+  };
+
+  const handleQuizStart = (moduleId) => {
+    setCurrentQuizModule(moduleId);
+    setShowQuizModal(true);
+  };
+
+  const handleQuizResult = (passed) => {
+    setModules((prevModules) =>
+      prevModules.map((module) => {
+        if (module.id === currentQuizModule) {
+          const newStatus = passed ? "passed" : "failed";
+          return { ...module, quizStatus: newStatus };
+        }
+        if (passed && module.id === currentQuizModule + 1) {
+          // Unlock next module and all its lessons, and make quiz available
+          return {
+            ...module,
+            locked: false,
+            quizStatus: "available",
+            lessons: module.lessons.map((lesson) => ({
+              ...lesson,
+              locked: false,
+            })),
+          };
+        }
+        return module;
+      })
+    );
+    // Move clearing currentQuizModule to after modal close to avoid fetch with null moduleId race
+    // setCurrentQuizModule(null);
+  };
+
+  const getNextLesson = () => {
+    if (currentLesson) {
+      const nextId = currentLesson.id + 1;
+      const allLessons = modules.flatMap((module) => module.lessons);
+      return allLessons.find((lesson) => lesson.id === nextId) || null;
+    } else {
+      for (const module of modules) {
+        for (const lesson of module.lessons) {
+          if (lesson.status !== "completed") {
+            return lesson;
+          }
+        }
+      }
+      return null; // All lessons completed
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="lv-page">
+        <div className="lv-page-inner">
+          <button
+            onClick={() => navigate("/student/courses")}
+            className="lv-back-to-courses"
+          >
+            Back to Courses
+          </button>
+          <main className="lv-main">
+            <h2 className="lv-title">Loading Course...</h2>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="lv-page">
+        <div className="lv-page-inner">
+          <button
+            onClick={() => navigate("/student/courses")}
+            className="lv-back-to-courses"
+          >
+            Back to Courses
+          </button>
+          <main className="lv-main">
+            <h2 className="lv-title">Error</h2>
+            <p>{error}</p>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="lv-page">
+      <div className="lv-page-inner">
+        <button
+          onClick={() => navigate("/student/courses")}
+          className="lv-back-to-courses"
+        >
+          Back to Courses
+        </button>
+        <main className="lv-main">
+          <h2 className="lv-title">
+            {course ? course.title : "Continue Learning"}
+          </h2>
+          {course && (
+            <div className="lv-course-info">
+              <p className="lv-course-description">{course.description}</p>
+            </div>
+          )}
+          <div className="lv-panel">
+            <LessonViewer
+              lesson={currentLesson}
+              status={lessonStatus}
+              onStart={() => handleLessonStart(currentLesson)}
+              onResume={handleLessonResume}
+              onStop={handleLessonStop}
+              onComplete={handleLessonComplete}
+              onNextLesson={handleNextLesson}
+            />
+            <div className="lv-panel-body">
+              <div className="lv-section-gap">
+                <div className="lv-flex-between lv-small lv-muted">
+                  <span>Progress</span>
+                  <span>{overallProgress}%</span>
+                </div>
+                <div className="lv-progress-track">
+                  <div
+                    className="lv-progress-fill"
+                    style={{ width: `${overallProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {showQuizModal && (
+            <QuizModal
+              moduleId={currentQuizModule}
+              onClose={() => setShowQuizModal(false)}
+              onResult={handleQuizResult}
+            />
+          )}
+
+          <div className="lv-section">
+            <h4 className="lv-heading">Resume where you left off</h4>
+            <div className="lv-resume-card">
+              <div className="lv-resume-left">
+                <span className="material-icons lv-resume-icon">
+                  play_circle_outline
+                </span>
+                <div>
+                  <p className="lv-strong">
+                    {currentLesson
+                      ? `${currentLesson.moduleName}`
+                      : "No lesson selected"}
+                  </p>
+                  <p className="lv-small">
+                    {currentLesson
+                      ? currentLesson.name
+                      : "Select a lesson to start"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                id="resume-btn"
+                className="lv-primary-btn"
+                onClick={() => {
+                  if (!currentLesson) {
+                    const next = getNextLesson();
+                    if (next) handleLessonStart(next);
+                  } else if (
+                    lessonStatus === "not-started" ||
+                    lessonStatus === "completed"
+                  ) {
+                    handleLessonStart(currentLesson);
+                  } else if (lessonStatus === "paused") {
+                    handleLessonResume();
+                  } else if (lessonStatus === "in-progress") {
+                    handleLessonStop();
+                  }
+                }}
+                disabled={!currentLesson && !getNextLesson()}
+              >
+                {!currentLesson
+                  ? "Start"
+                  : lessonStatus === "in-progress"
+                  ? "Stop"
+                  : lessonStatus === "paused"
+                  ? "Resume"
+                  : "Start"}
+              </button>
+            </div>
+          </div>
+
+          <div className="lv-section">
+            {(() => {
+              const nextLesson = getNextLesson();
+              return (
+                <div className="lv-next-card">
+                  <div className="lv-next-left">
+                    <span className="material-icons lv-next-icon">
+                      arrow_forward
+                    </span>
+                    <div>
+                      <p className="lv-strong">
+                        {nextLesson
+                          ? `${nextLesson.moduleName}`
+                          : "All lessons completed"}
+                      </p>
+                      <p className="lv-small">
+                        {nextLesson ? nextLesson.name : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="lv-link-btn"
+                    onClick={() => nextLesson && handleLessonStart(nextLesson)}
+                    disabled={
+                      !nextLesson ||
+                      (currentLesson &&
+                        lessonStatus !== "completed" &&
+                        !modules.find((m) => !m.locked))
+                    }
+                  >
+                    Next Lesson
+                    <span className="material-icons lv-link-icon">
+                      arrow_forward
+                    </span>
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+
+          <div className="lv-section">
+            <h4 className="lv-section-title">Course Outline</h4>
+            <CourseOutline
+              modules={modules}
+              onLessonStart={handleLessonStart}
+              onLessonComplete={handleLessonComplete}
+              onQuizStart={handleQuizStart}
+            />
+            <div
+              className="discord-join"
+              style={{ marginTop: "20px", display: "flex", alignItems: "center", cursor: "pointer", color: "#7289da" }}
+              onClick={() => {
+                const userInfo = localStorage.getItem("user");
+                let userEmail = null;
+                if (userInfo) {
+                  try {
+                    const parsedUser = JSON.parse(userInfo);
+                    userEmail = parsedUser.email;
+                  } catch {
+                    userEmail = null;
+                  }
+                }
+                if (userEmail) {
+                  window.location.href = `http://localhost:5000/api/auth/discord/join?email=${encodeURIComponent(userEmail)}`;
+                } else {
+                  alert("Please login to join our Discord server.");
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  const userInfo = localStorage.getItem("user");
+                  let userEmail = null;
+                  if (userInfo) {
+                    try {
+                      const parsedUser = JSON.parse(userInfo);
+                      userEmail = parsedUser.email;
+                    } catch {
+                      userEmail = null;
+                    }
+                  }
+                  if (userEmail) {
+                    window.location.href = `http://localhost:5000/api/auth/discord/join?email=${encodeURIComponent(userEmail)}`;
+                  } else {
+                    alert("Please login to join our Discord server.");
+                  }
+                }
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-discord" viewBox="0 0 16 16" style={{ marginRight: "8px" }}>
+                <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
+              </svg>
+              <span style={{ fontWeight: "bold", fontSize: "16px" }}>Join our Discord server</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
