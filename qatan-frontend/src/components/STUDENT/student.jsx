@@ -3,6 +3,8 @@ import { Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import LessonViewer from "./LessonViewer";
+import CertificateModal from "./CertificateModal";
+import CourseSkeleton from "../common/CourseSkeleton";
 import "./student.css";
 
 const Student = () => {
@@ -11,6 +13,7 @@ const Student = () => {
   const [activeLink, setActiveLink] = useState("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -411,7 +414,9 @@ const Student = () => {
           My Courses
         </h1>
         {loading ? (
-          <p style={{ color: "var(--secondary-text)" }}>Loading courses...</p>
+          <div className="student-responsive-grid">
+            <CourseSkeleton count={4} />
+          </div>
         ) : enrollments.length === 0 ? (
           <p style={{ color: "var(--secondary-text)" }}>
             You haven't enrolled in any courses yet.
@@ -429,6 +434,8 @@ const Student = () => {
                   borderRadius: "16px",
                   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
                   padding: "var(--card-padding)",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
                 <img
@@ -460,6 +467,7 @@ const Student = () => {
                   style={{
                     color: "var(--secondary-text)",
                     marginBottom: "var(--spacing-md)",
+                    flex: 1,
                   }}
                 >
                   {enrollment.course.description}
@@ -469,33 +477,66 @@ const Student = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "8px",
                   }}
                 >
                   <span
                     style={{
                       fontSize: "var(--font-size-small)",
                       color: "var(--muted-text)",
+                      fontWeight: "500",
                     }}
                   >
                     Progress: {enrollment.progress || 0}%
                   </span>
-                  <button
-                    style={{
-                      backgroundColor: "var(--button-bg)",
-                      color: "var(--button-color)",
-                      padding: "var(--button-padding)",
-                      borderRadius: "var(--border-radius-small)",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      navigate("/student/lesson", {
-                        state: { courseId: enrollment.course.id },
-                      })
-                    }
-                  >
-                    {enrollment.progress > 0 ? "Continue" : "Start"}
-                  </button>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    {(enrollment.progress === 100 || enrollment.status === "completed") && (
+                      <button
+                        type="button"
+                        style={{
+                          backgroundColor: "#d97706",
+                          color: "#ffffff",
+                          padding: "0.5rem 0.875rem",
+                          borderRadius: "var(--border-radius-small)",
+                          border: "none",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontWeight: "600",
+                          fontSize: "0.8125rem",
+                          boxShadow: "0 2px 4px rgba(217, 119, 6, 0.2)",
+                        }}
+                        onClick={() =>
+                          setSelectedCertificate({
+                            courseTitle: enrollment.course.title,
+                            instructorName: enrollment.course.instructor?.name || "Lead Instructor",
+                            studentName: user?.name,
+                          })
+                        }
+                      >
+                        🎓 Certificate
+                      </button>
+                    )}
+                    <button
+                      style={{
+                        backgroundColor: "var(--button-bg)",
+                        color: "var(--button-color)",
+                        padding: "var(--button-padding)",
+                        borderRadius: "var(--border-radius-small)",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        navigate("/student/lesson", {
+                          state: { courseId: enrollment.course.id },
+                        })
+                      }
+                    >
+                      {enrollment.progress > 0 ? "Continue" : "Start"}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1439,6 +1480,15 @@ const Student = () => {
           <Route path="help" element={<StudentHelp />} />
         </Routes>
       </div>
+
+      {selectedCertificate && (
+        <CertificateModal
+          studentName={selectedCertificate.studentName || user?.name || "Verified Student"}
+          courseTitle={selectedCertificate.courseTitle}
+          instructorName={selectedCertificate.instructorName}
+          onClose={() => setSelectedCertificate(null)}
+        />
+      )}
     </div>
   );
 };

@@ -6,34 +6,133 @@ import "./LessonViewer.css";
 function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
   const videoRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const formatTime = (timeInSeconds) => {
+    if (isNaN(timeInSeconds) || timeInSeconds === 0) return "0:00";
+    const mins = Math.floor(timeInSeconds / 60);
+    const secs = Math.floor(timeInSeconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   useEffect(() => {
     if (status === "in-progress" && videoRef.current) {
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
     } else if (videoRef.current) {
       videoRef.current.pause();
+      setIsPlaying(false);
     }
   }, [status]);
 
+  // Fullscreen change listener
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       const handleFullscreenChange = () => {
         setIsFullscreen(!!document.fullscreenElement);
       };
-      video.addEventListener("fullscreenchange", handleFullscreenChange);
+      document.addEventListener("fullscreenchange", handleFullscreenChange);
       return () => {
-        video.removeEventListener("fullscreenchange", handleFullscreenChange);
+        document.removeEventListener("fullscreenchange", handleFullscreenChange);
       };
     }
   }, []);
 
+  // Restore playback position on load
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    setDuration(video.duration);
+    if (lesson?.id) {
+      const savedTime = localStorage.getItem(`qatan_video_${lesson.id}`);
+      if (savedTime && parseFloat(savedTime) < video.duration - 5) {
+        video.currentTime = parseFloat(savedTime);
+      }
+    }
+    video.playbackRate = playbackSpeed;
+  };
+
+  // Save playback progress periodically
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    setCurrentTime(video.currentTime);
+    if (lesson?.id && Math.floor(video.currentTime) % 4 === 0) {
+      localStorage.setItem(`qatan_video_${lesson.id}`, video.currentTime.toString());
+    }
+  };
+
+  const handleSpeedChange = (speed) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+  };
+
+  const skipSeconds = (seconds) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(
+        0,
+        Math.min(videoRef.current.duration || 0, videoRef.current.currentTime + seconds)
+      );
+    }
+  };
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    const container = videoRef.current?.parentElement;
+    if (!container) return;
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)) return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        skipSeconds(-10);
+      } else if (e.code === "ArrowRight") {
+        e.preventDefault();
+        skipSeconds(10);
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleComplete = () => {
+    if (lesson?.id) {
+      localStorage.removeItem(`qatan_video_${lesson.id}`);
+    }
     onComplete();
   };
 
   if (!lesson) {
-    // When no lesson is selected, still render the media wrapper.
     return (
       <div className="lv-media-wrap">
         <div className="lv-placeholder">
@@ -57,6 +156,10 @@ function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
         className="lv-media"
         controls={true}
         autoPlay
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
         onEnded={handleComplete}
       />
     );
@@ -66,16 +169,14 @@ function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
         src={mediaSrc}
         alt={lesson.name}
         className="lv-media img-contain"
-        onLoad={() => handleComplete()} // Assume image viewing completes immediately
+        onLoad={() => handleComplete()}
       />
     );
   } else {
-    // Remove document support, show message instead
     mediaElement = (
       <div className="lv-media lv-media-empty">
         <p className="lv-media-empty-text">
-          Document viewing is not supported. Please use video or image lessons
-          only.
+          Document viewing is not supported. Please use video or image lessons only.
         </p>
       </div>
     );
@@ -84,6 +185,72 @@ function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
   return (
     <div className="lv-media-wrap">
       {mediaElement}
+      
+      {/* Enhanced Pro Controls Toolbar for Videos */}
+      {ext === "mp4" && (
+        <div className="lv-pro-toolbar">
+          <div className="lv-toolbar-left">
+            <button
+              type="button"
+              onClick={togglePlay}
+              className="lv-tool-btn"
+              title={isPlaying ? "Pause (Space)" : "Play (Space)"}
+            >
+              <span className="material-icons">
+                {isPlaying ? "pause" : "play_arrow"}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => skipSeconds(-10)}
+              className="lv-tool-btn"
+              title="Rewind 10s (←)"
+            >
+              <span className="material-icons">replay_10</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => skipSeconds(10)}
+              className="lv-tool-btn"
+              title="Forward 10s (→)"
+            >
+              <span className="material-icons">forward_10</span>
+            </button>
+            <span className="lv-timestamp">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+          </div>
+
+          <div className="lv-toolbar-right">
+            <div className="lv-speed-selector">
+              {[0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                <button
+                  type="button"
+                  key={speed}
+                  onClick={() => handleSpeedChange(speed)}
+                  className={`lv-speed-pill ${
+                    playbackSpeed === speed ? "active" : ""
+                  }`}
+                  title={`Speed ${speed}x`}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="lv-tool-btn"
+              title="Fullscreen (F)"
+            >
+              <span className="material-icons">
+                {isFullscreen ? "fullscreen_exit" : "fullscreen"}
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {status === "completed" && ext === "mp4" && (
         <button
           onClick={onNextLesson}
@@ -98,6 +265,7 @@ function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
     </div>
   );
 }
+
 
 function CourseOutline({
   modules,

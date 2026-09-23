@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CourseCard from "./MainCourseCard";
+import CourseSkeleton from "../common/CourseSkeleton";
 import "./MainIndex.css";
 
 export default function Courses() {
@@ -147,7 +148,7 @@ export default function Courses() {
         </div>
         <div className="Main-courses-grid">
           {loading ? (
-            <div className="Main-loading">Loading courses...</div>
+            <CourseSkeleton count={6} />
           ) : filteredCourses.length > 0 ? (
             filteredCourses.map((c) => (
               <div
