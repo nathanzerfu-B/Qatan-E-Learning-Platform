@@ -161,4 +161,5 @@ The frontend application will run on `http://localhost:5173`.
 ---
 
 ## 📄 License
-This project is proprietary and developed by **Nathan Zerfu**. All rights reserved.
+This project is proprietary and developed by **Nathan Zerfu ,
+SamstarkSnow ,H4kim41**. All rights reserved.
