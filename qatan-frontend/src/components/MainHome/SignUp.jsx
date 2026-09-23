@@ -132,8 +132,9 @@ export default function SignUp() {
         setTimer(120);
         setAttemptsLeft(3);
         setResendEnabled(false);
-        // Proceed to verification step
-        handleNext();
+        setError("");
+        // Proceed directly to verification step
+        setStep(3);
       }
     } catch (err) {
       console.error(err);
@@ -379,16 +380,19 @@ export default function SignUp() {
           {step === 2 && (
             <div className="signup-form-card">
               <h3 className="signup-title">Complete Registration</h3>
-              <p className="signup-subtitle">
-                We'll send a verification code to your email address.
+              <p className="signup-subtitle" style={{ marginBottom: "1.5rem" }}>
+                We will send a 6-digit verification code to{" "}
+                <strong style={{ color: "#0d7ff2" }}>{email}</strong>.
               </p>
+
+              {error && <div className="error-alert">{error}</div>}
 
               <button
                 onClick={handleRegister}
                 disabled={loading}
                 className="signup-btn"
               >
-                {loading ? "Sending..." : "Send Verification Code"}
+                {loading ? "Sending Code..." : "Send Verification Code"}
               </button>
 
               <div className="signup-btn-row">
@@ -403,9 +407,12 @@ export default function SignUp() {
           {step === 3 && (
             <div className="signup-form-card">
               <h3 className="signup-title">Verify Your Email</h3>
-              <p className="signup-subtitle">
-                We've sent a 6-digit verification code to {email}
+              <p className="signup-subtitle" style={{ marginBottom: "1.5rem" }}>
+                We've sent a 6-digit verification code to{" "}
+                <strong style={{ color: "#0d7ff2" }}>{email}</strong>
               </p>
+
+              {error && <div className="error-alert">{error}</div>}
 
               <div className="signup-form-group">
                 <label>Verification Code</label>

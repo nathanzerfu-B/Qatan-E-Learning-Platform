@@ -63,10 +63,50 @@ export const registerUser = async (req, res) => {
 
     // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing)
-      return res
-        .status(400)
-        .json({ success: false, message: "Email already exists" });
+    if (existing) {
+      if (existing.isVerified) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Email already registered and verified. Please log in." });
+      }
+
+      // If user registered earlier but has not verified yet:
+      // Allow them to update their details and re-send the code instead of getting locked out
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          name,
+          password: hashedPassword,
+          role,
+          status: role === "instructor" ? "pending" : "active",
+          verificationCode,
+          verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000), // 10 min expiry
+          verificationCodeAttempts: 0,
+        },
+      });
+
+      try {
+        await sendVerificationEmail(email, verificationCode);
+        console.log("📧 Re-sent verification email to unverified user:", email);
+      } catch (emailError) {
+        console.error("❌ Email sending failed:", emailError);
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Verification code sent to your email. Please check your inbox.",
+        user: {
+          id: existing.id,
+          name,
+          email,
+          role,
+          status: role === "instructor" ? "pending" : "active",
+        },
+      });
+    }
 
     // Email existence/validity check before sending any verification code
     const verification = await validateEmailDeliverability(email);
@@ -92,7 +132,7 @@ export const registerUser = async (req, res) => {
         role,
         status: role === "instructor" ? "pending" : "active",
         verificationCode,
-        verificationCodeExpires: new Date(Date.now() + 2 * 60 * 1000), // 2 min expiry
+        verificationCodeExpires: new Date(Date.now() + 10 * 60 * 1000), // 10 min expiry
         verificationCodeAttempts: 0,
         isVerified: false,
       },
@@ -287,23 +327,13 @@ export const resendCode = async (req, res) => {
     }
 
     const now = new Date();
-    const isExpired =
-      user.verificationCodeExpires && now > user.verificationCodeExpires;
-    const maxAttempts = user.verificationCodeAttempts >= 3;
-
-    if (!isExpired && !maxAttempts) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Previous code is still valid" });
-    }
-
     const newCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     await prisma.user.update({
       where: { id: user.id },
       data: {
         verificationCode: newCode,
-        verificationCodeExpires: new Date(now.getTime() + 2 * 60 * 1000),
+        verificationCodeExpires: new Date(now.getTime() + 10 * 60 * 1000), // 10 min expiry
         verificationCodeAttempts: 0,
       },
     });

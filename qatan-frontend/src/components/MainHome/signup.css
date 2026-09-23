@@ -610,3 +610,22 @@
 .dark .signup-footer-copyright {
   color: #9ca3af;
 }
+
+.error-alert {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.dark .error-alert {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
