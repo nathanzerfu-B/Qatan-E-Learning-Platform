@@ -86,15 +86,37 @@ const Student = () => {
     }, []);
 
     const enrolledCount = enrollments.length;
-    const completedCount = enrollments.filter((e) => e.progress === 100).length;
-    const totalHours = enrollments.reduce(
-      (sum, e) => sum + (e.progress || 0),
-      0
-    );
+    const completedCount = enrollments.filter(
+      (e) => e.progress === 100 || e.status === "completed"
+    ).length;
+    const inProgressCount = enrollments.filter(
+      (e) => (e.progress || 0) > 0 && e.progress < 100
+    ).length;
+    const avgProgress =
+      enrolledCount > 0
+        ? Math.round(
+            enrollments.reduce((sum, e) => sum + (e.progress || 0), 0) /
+              enrolledCount
+          )
+        : 0;
+
+    const currentActive =
+      enrollments.find((e) => (e.progress || 0) > 0 && e.progress < 100) ||
+      enrollments[0];
+
+    const weekDays = [
+      { day: "M", label: "Mon", active: true },
+      { day: "T", label: "Tue", active: true },
+      { day: "W", label: "Wed", active: true },
+      { day: "T", label: "Thu", active: true },
+      { day: "F", label: "Fri", active: false },
+      { day: "S", label: "Sat", active: false },
+      { day: "S", label: "Sun", active: false },
+    ];
 
     return (
       <div className="min-h-screen bg-background text-foreground p-6 sm:p-8 space-y-8 text-left">
-        {/* Header and Back Button */}
+        {/* Welcome Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <Button
@@ -109,23 +131,33 @@ const Student = () => {
               Welcome back, {user?.name || "Student"}! 👋
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Here's an overview of your learning journey and recent progress.
+              Track your learning momentum, course milestones, and certificates.
             </p>
           </div>
-          <Button
-            variant="default"
-            size="default"
-            onClick={() => setActiveAndClose("courses")}
-            className="shadow-sm font-semibold"
-          >
-            Continue Learning
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => navigate("/courses")}
+              className="shadow-sm font-medium"
+            >
+              Browse Catalog
+            </Button>
+            <Button
+              variant="default"
+              size="default"
+              onClick={() => setActiveAndClose("courses")}
+              className="shadow-sm font-semibold"
+            >
+              My Courses
+            </Button>
+          </div>
         </div>
 
-        {/* KPI Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Card 1 */}
-          <Card className="hover:border-primary/40 transition-all hover:shadow-md">
+        {/* 4 Responsive KPI Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Metric 1: Enrolled */}
+          <Card className="hover:border-primary/50 transition-all hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
                 Enrolled Courses
@@ -142,16 +174,40 @@ const Student = () => {
               </div>
               <div className="mt-2 flex items-center gap-1.5">
                 <Badge variant="primary" className="text-[11px]">Active</Badge>
-                <span className="text-xs text-muted-foreground">in current curriculum</span>
+                <span className="text-xs text-muted-foreground">Total registered</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Card 2 */}
-          <Card className="hover:border-emerald-500/40 transition-all hover:shadow-md">
+          {/* Metric 2: In Progress */}
+          <Card className="hover:border-blue-500/50 transition-all hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Completed Courses
+                In Progress
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tracking-tight text-foreground">
+                {loading ? "..." : inProgressCount}
+              </div>
+              <div className="mt-2 flex items-center gap-1.5">
+                <Badge variant="secondary" className="text-[11px]">Learning</Badge>
+                <span className="text-xs text-muted-foreground">Currently studying</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Metric 3: Completed */}
+          <Card className="hover:border-emerald-500/50 transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Completed
               </CardTitle>
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,17 +220,17 @@ const Student = () => {
                 {loading ? "..." : completedCount}
               </div>
               <div className="mt-2 flex items-center gap-1.5">
-                <Badge variant="success" className="text-[11px]">Certificates earned</Badge>
-                <span className="text-xs text-muted-foreground">verified completion</span>
+                <Badge variant="success" className="text-[11px]">Certificates</Badge>
+                <span className="text-xs text-muted-foreground">Verified finishes</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Card 3 */}
-          <Card className="hover:border-amber-500/40 transition-all hover:shadow-md">
+          {/* Metric 4: Avg Progress */}
+          <Card className="hover:border-amber-500/50 transition-all hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Study Progress Index
+                Avg. Completion
               </CardTitle>
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -184,11 +240,132 @@ const Student = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold tracking-tight text-foreground">
-                {loading ? "..." : `${totalHours} pts`}
+                {loading ? "..." : `${avgProgress}%`}
               </div>
-              <div className="mt-2 flex items-center gap-1.5">
-                <Badge variant="warning" className="text-[11px]">Consistent</Badge>
-                <span className="text-xs text-muted-foreground">calculated progress units</span>
+              <div className="mt-2 space-y-1">
+                <Progress value={avgProgress} className="h-1.5" />
+                <span className="text-[11px] text-muted-foreground">Overall completion index</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Hero "Jump Back In" Card & Learning Streak Widget */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Jump Back In Card (2 Columns) */}
+          <div className="lg:col-span-2">
+            {currentActive ? (
+              <Card className="overflow-hidden border-primary/20 shadow-md">
+                <div className="p-6 sm:p-7 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                  <div className="relative w-full sm:w-48 aspect-video rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner">
+                    <img
+                      src={currentActive.course.thumbnailUrl || "/img/student/python.png"}
+                      alt={currentActive.course.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 left-2">
+                      <Badge variant="secondary" className="backdrop-blur bg-background/80 text-[10px]">
+                        {currentActive.course.category || "Course"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 space-y-3 w-full">
+                    <div>
+                      <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                        Resume Where You Left Off
+                      </span>
+                      <h2 className="text-xl font-bold text-foreground mt-0.5 leading-snug">
+                        {currentActive.course.title}
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                        Instructor: {currentActive.course.instructor?.name || "Lead Instructor"}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-medium">
+                        <span className="text-muted-foreground">Course Progress</span>
+                        <span className="text-foreground font-semibold">{currentActive.progress || 0}%</span>
+                      </div>
+                      <Progress value={currentActive.progress || 0} />
+                    </div>
+
+                    <div className="pt-2 flex items-center gap-3">
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          navigate("/student/lesson", {
+                            state: { courseId: currentActive.course.id },
+                          })
+                        }
+                        className="font-semibold shadow-sm"
+                      >
+                        ▶ Resume Lesson
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setActiveAndClose("courses")}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        All My Courses →
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-8 text-center flex flex-col items-center justify-center h-full">
+                <div className="p-4 rounded-full bg-primary/10 text-primary mb-3">
+                  <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-foreground">Start Learning Today</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                  You haven't enrolled in any courses yet. Choose from dozens of top-rated courses and earn certificates.
+                </p>
+                <Button className="mt-4" onClick={() => navigate("/courses")}>
+                  Explore Course Catalog
+                </Button>
+              </Card>
+            )}
+          </div>
+
+          {/* Learning Streak & Weekly Goal (1 Column) */}
+          <Card className="flex flex-col justify-between">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-bold text-foreground flex items-center gap-1.5">
+                  <span>🔥</span> Weekly Streak
+                </CardTitle>
+                <Badge variant="warning" className="text-[11px]">4 Days Active</Badge>
+              </div>
+              <CardDescription>
+                Keep your momentum alive with daily practice.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center gap-1">
+                {weekDays.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center gap-1.5">
+                    <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
+                    <div
+                      className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                        item.active
+                          ? "bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {item.active ? "✓" : item.day}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="p-3 rounded-lg bg-muted/60 border border-border/50 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">Tip: </span>
+                Completing 1 lesson per day increases your completion probability by 74%!
               </div>
             </CardContent>
           </Card>
@@ -236,6 +413,8 @@ const Student = () => {
   const StudentCourses = () => {
     const [enrollments, setEnrollments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filterStatus, setFilterStatus] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
       const fetchEnrollments = async () => {
@@ -259,47 +438,157 @@ const Student = () => {
       fetchEnrollments();
     }, []);
 
+    const inProgressCount = enrollments.filter(
+      (e) => (e.progress || 0) > 0 && e.progress < 100
+    ).length;
+    const completedCount = enrollments.filter(
+      (e) => e.progress === 100 || e.status === "completed"
+    ).length;
+
+    const filtered = enrollments.filter((e) => {
+      const isCompleted = e.progress === 100 || e.status === "completed";
+      const matchesStatus =
+        filterStatus === "all"
+          ? true
+          : filterStatus === "completed"
+          ? isCompleted
+          : !isCompleted;
+      const matchesSearch = e.course.title
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase().trim());
+      return matchesStatus && matchesSearch;
+    });
+
     return (
       <div className="min-h-screen bg-background text-foreground p-6 sm:p-8 space-y-8 text-left">
-        <div>
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="mb-3 gap-2 text-muted-foreground hover:text-foreground"
+            >
+              ← Back to Main
+            </Button>
+            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+              My Courses
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Pick up where you left off or review completed courses and earned certificates.
+            </p>
+          </div>
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="mb-3 gap-2 text-muted-foreground hover:text-foreground"
+            onClick={() => navigate("/courses")}
+            className="shadow-sm font-medium self-start sm:self-auto"
           >
-            ← Back to Main
+            + Enroll in More Courses
           </Button>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-            My Courses
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Pick up where you left off or review completed courses.
-          </p>
         </div>
 
+        {/* Filter and Search Bar */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-4">
+          {/* Status Tabs */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setFilterStatus("all")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                filterStatus === "all"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+            >
+              All ({enrollments.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus("in_progress")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                filterStatus === "in_progress"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+            >
+              In Progress ({inProgressCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus("completed")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                filterStatus === "completed"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+              }`}
+            >
+              Completed ({completedCount})
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative w-full md:w-72">
+            <input
+              type="text"
+              placeholder="Search your courses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-card text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <svg
+              className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* Courses Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <CourseSkeleton count={4} />
+            <CourseSkeleton count={6} />
           </div>
-        ) : enrollments.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <Card className="p-12 text-center">
-            <p className="text-muted-foreground mb-4">
-              You haven't enrolled in any courses yet.
+            <div className="p-4 rounded-full bg-muted w-14 h-14 mx-auto flex items-center justify-center text-muted-foreground mb-3">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-base font-semibold text-foreground">No courses found</h3>
+            <p className="text-xs text-muted-foreground mt-1 mb-4">
+              {searchQuery
+                ? `No courses matching "${searchQuery}"`
+                : "You don't have any courses in this category yet."}
             </p>
-            <Button onClick={() => navigate("/courses")}>
-              Browse Course Catalog
-            </Button>
+            {searchQuery ? (
+              <Button size="sm" variant="outline" onClick={() => setSearchQuery("")}>
+                Clear Search
+              </Button>
+            ) : (
+              <Button size="sm" onClick={() => navigate("/courses")}>
+                Browse Catalog
+              </Button>
+            )}
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {enrollments.map((enrollment) => {
+            {filtered.map((enrollment) => {
               const isCompleted =
                 enrollment.progress === 100 || enrollment.status === "completed";
               return (
                 <Card
                   key={enrollment.id}
-                  className="overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 hover:border-primary/40 group"
+                  className="overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 hover:border-primary/50 group"
                 >
                   <div className="relative aspect-video w-full overflow-hidden bg-muted">
                     <img
@@ -309,6 +598,14 @@ const Student = () => {
                       alt={enrollment.course.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
+                    <div className="absolute top-3 left-3">
+                      <Badge
+                        variant="secondary"
+                        className="backdrop-blur bg-background/85 text-[10px] shadow-sm font-medium"
+                      >
+                        {enrollment.course.category || "General"}
+                      </Badge>
+                    </div>
                     <div className="absolute top-3 right-3">
                       <Badge variant={isCompleted ? "success" : "default"}>
                         {isCompleted ? "Completed" : "In Progress"}
@@ -317,7 +614,7 @@ const Student = () => {
                   </div>
 
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="text-lg font-bold text-foreground line-clamp-1 mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-base font-bold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
                       {enrollment.course.title}
                     </h3>
                     <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1">
@@ -339,7 +636,7 @@ const Student = () => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10 font-medium"
+                            className="text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10 font-medium text-xs"
                             onClick={() =>
                               setSelectedCertificate({
                                 courseTitle: enrollment.course.title,
@@ -356,7 +653,7 @@ const Student = () => {
                         <Button
                           variant={isCompleted ? "secondary" : "default"}
                           size="sm"
-                          className="ml-auto"
+                          className="ml-auto font-semibold"
                           onClick={() =>
                             navigate("/student/lesson", {
                               state: { courseId: enrollment.course.id },
