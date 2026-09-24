@@ -2085,3 +2085,15 @@
   color: #374151;
 }
 
+/* Defensive Search & UI Icon Utility */
+.search-icon {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  pointer-events: none;
+}
+
+

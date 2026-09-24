@@ -154,7 +154,18 @@ export default function Courses() {
             {/* Search Input */}
             <div className="relative flex-1">
               <svg
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                className="search-icon absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                width="16"
+                height="16"
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  minWidth: "16px",
+                  minHeight: "16px",
+                  maxWidth: "16px",
+                  maxHeight: "16px",
+                  pointerEvents: "none",
+                }}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -171,7 +182,7 @@ export default function Courses() {
                 placeholder="Search courses, instructors, topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                className="w-full pl-10 pr-9 py-2 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
               />
               {searchQuery && (
                 <button
@@ -395,7 +406,7 @@ export default function Courses() {
           </div>
 
           {/* Grid Container */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
             {loading ? (
               <CourseSkeleton count={6} />
             ) : filteredCourses.length > 0 ? (
