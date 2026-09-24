@@ -20,4 +20,24 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export { authMiddleware };
+/**
+ * 🛡️ Role-Based Access Control (RBAC) Guard
+ * Restricts route access to specific user roles (e.g. 'admin', 'instructor', 'student')
+ */
+const requireRole = (...allowedRoles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: "Authentication required" });
+  }
+
+  if (!allowedRoles.includes(req.user.role)) {
+    return res.status(403).json({
+      success: false,
+      message: `Forbidden: Access requires one of [${allowedRoles.join(", ")}]`,
+    });
+  }
+
+  next();
+};
+
+export { authMiddleware, requireRole };
+
