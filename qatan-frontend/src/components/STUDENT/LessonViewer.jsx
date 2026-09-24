@@ -1031,23 +1031,41 @@ export default function App() {
 
   return (
     <div className="lv-page">
-      <div className="lv-page-inner">
-        <button
-          onClick={() => navigate("/student/courses")}
-          className="lv-back-to-courses"
-        >
-          Back to Courses
-        </button>
-        <main className="lv-main">
-          <h2 className="lv-title">
+      {/* Top Studio Navigation Bar */}
+      <header className="lv-top-nav-bar sticky top-0 z-30 shadow-sm backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate("/student/courses")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground transition-all"
+          >
+            ← Back to Courses
+          </button>
+          <span className="text-muted-foreground hidden sm:inline">•</span>
+          <h1 className="text-sm font-bold text-foreground truncate max-w-xs sm:max-w-md">
             {course ? course.title : "Continue Learning"}
-          </h2>
-          {course && (
-            <div className="lv-course-info">
-              <p className="lv-course-description">{course.description}</p>
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-xs font-semibold text-foreground">
+              {overallProgress}% Completed
+            </span>
+            <div className="w-28 h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+              <div
+                className="h-full bg-primary transition-all duration-300 rounded-full"
+                style={{ width: `${overallProgress}%` }}
+              />
             </div>
-          )}
-          <div className="lv-panel">
+          </div>
+        </div>
+      </header>
+
+      {/* 2-Column Cinema Studio Layout */}
+      <div className="lv-cinema-layout">
+        {/* Left Column: Video Cinema Player & Lesson Details */}
+        <div className="flex flex-col gap-6">
+          <div className="w-full">
             <LessonViewer
               lesson={currentLesson}
               status={lessonStatus}
@@ -1057,124 +1075,95 @@ export default function App() {
               onComplete={handleLessonComplete}
               onNextLesson={handleNextLesson}
             />
-            <div className="lv-panel-body">
-              <div className="lv-section-gap">
-                <div className="lv-flex-between lv-small lv-muted">
-                  <span>Progress</span>
-                  <span>{overallProgress}%</span>
-                </div>
-                <div className="lv-progress-track">
-                  <div
-                    className="lv-progress-fill"
-                    style={{ width: `${overallProgress}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
           </div>
-          {showQuizModal && (
-            <QuizModal
-              moduleId={currentQuizModule}
-              onClose={() => setShowQuizModal(false)}
-              onResult={handleQuizResult}
-            />
-          )}
 
-          <div className="lv-section">
-            <h4 className="lv-heading">Resume where you left off</h4>
-            <div className="lv-resume-card">
-              <div className="lv-resume-left">
-                <span className="material-icons lv-resume-icon">
-                  play_circle_outline
+          {/* Active Lesson Controls & Information */}
+          <div className="p-6 bg-card rounded-2xl border border-border/80 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+              <div>
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-1">
+                  {currentLesson ? currentLesson.moduleName : "Course Overview"}
                 </span>
-                <div>
-                  <p className="lv-strong">
-                    {currentLesson
-                      ? `${currentLesson.moduleName}`
-                      : "No lesson selected"}
-                  </p>
-                  <p className="lv-small">
-                    {currentLesson
-                      ? currentLesson.name
-                      : "Select a lesson to start"}
-                  </p>
-                </div>
+                <h2 className="text-lg font-bold text-foreground">
+                  {currentLesson ? currentLesson.name : "Select a lesson to begin"}
+                </h2>
               </div>
-              <button
-                type="button"
-                id="resume-btn"
-                className="lv-primary-btn"
-                onClick={() => {
-                  if (!currentLesson) {
-                    const next = getNextLesson();
-                    if (next) handleLessonStart(next);
-                  } else if (
-                    lessonStatus === "not-started" ||
-                    lessonStatus === "completed"
-                  ) {
-                    handleLessonStart(currentLesson);
-                  } else if (lessonStatus === "paused") {
-                    handleLessonResume();
-                  } else if (lessonStatus === "in-progress") {
-                    handleLessonStop();
-                  }
-                }}
-                disabled={!currentLesson && !getNextLesson()}
-              >
-                {!currentLesson
-                  ? "Start"
-                  : lessonStatus === "in-progress"
-                  ? "Stop"
-                  : lessonStatus === "paused"
-                  ? "Resume"
-                  : "Start"}
-              </button>
-            </div>
-          </div>
 
-          <div className="lv-section">
-            {(() => {
-              const nextLesson = getNextLesson();
-              return (
-                <div className="lv-next-card">
-                  <div className="lv-next-left">
-                    <span className="material-icons lv-next-icon">
-                      arrow_forward
-                    </span>
-                    <div>
-                      <p className="lv-strong">
-                        {nextLesson
-                          ? `${nextLesson.moduleName}`
-                          : "All lessons completed"}
-                      </p>
-                      <p className="lv-small">
-                        {nextLesson ? nextLesson.name : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="lv-link-btn"
-                    onClick={() => nextLesson && handleLessonStart(nextLesson)}
-                    disabled={
-                      !nextLesson ||
-                      (currentLesson &&
-                        lessonStatus !== "completed" &&
-                        !modules.find((m) => !m.locked))
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  id="resume-btn"
+                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:opacity-95 transition-opacity"
+                  onClick={() => {
+                    if (!currentLesson) {
+                      const next = getNextLesson();
+                      if (next) handleLessonStart(next);
+                    } else if (
+                      lessonStatus === "not-started" ||
+                      lessonStatus === "completed"
+                    ) {
+                      handleLessonStart(currentLesson);
+                    } else if (lessonStatus === "paused") {
+                      handleLessonResume();
+                    } else if (lessonStatus === "in-progress") {
+                      handleLessonStop();
                     }
-                  >
-                    Next Lesson
-                    <span className="material-icons lv-link-icon">
-                      arrow_forward
-                    </span>
-                  </button>
-                </div>
-              );
-            })()}
-          </div>
+                  }}
+                  disabled={!currentLesson && !getNextLesson()}
+                >
+                  {!currentLesson
+                    ? "Start First Lesson"
+                    : lessonStatus === "in-progress"
+                    ? "Pause Lesson"
+                    : lessonStatus === "paused"
+                    ? "Resume Playback"
+                    : "Replay Lesson"}
+                </button>
 
-          <div className="lv-section">
-            <h4 className="lv-section-title">Course Outline</h4>
+                {(() => {
+                  const nextLesson = getNextLesson();
+                  return (
+                    <button
+                      type="button"
+                      className="px-4 py-2 rounded-xl bg-muted text-foreground border border-border text-xs font-bold hover:bg-muted/80 transition-colors disabled:opacity-50"
+                      onClick={() => nextLesson && handleLessonStart(nextLesson)}
+                      disabled={!nextLesson}
+                    >
+                      Next Lesson →
+                    </button>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Course & Lesson Description */}
+            {course && (
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <h3 className="font-semibold text-foreground text-sm">About this Course</h3>
+                <p className="leading-relaxed">{course.description}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Sticky Curriculum Sidebar */}
+        <div className="lv-sidebar-sticky">
+          <div className="p-5 bg-card rounded-2xl border border-border/80 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border/60">
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Course Content</h3>
+                <span className="text-[11px] text-muted-foreground">
+                  {modules.reduce((sum, m) => sum + m.completedLessons, 0)} of{" "}
+                  {modules.reduce((sum, m) => sum + m.totalLessons, 0)} lessons completed
+                </span>
+              </div>
+              <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                {overallProgress}%
+              </span>
+            </div>
+
+            {/* Curriculum Accordion */}
             <CourseOutline
               modules={modules}
               currentLessonId={currentLesson?.id}
@@ -1182,56 +1171,51 @@ export default function App() {
               onLessonComplete={handleLessonComplete}
               onQuizStart={handleQuizStart}
             />
-            <div
-              className="discord-join"
-              style={{ marginTop: "20px", display: "flex", alignItems: "center", cursor: "pointer", color: "#7289da" }}
-              onClick={() => {
-                const userInfo = localStorage.getItem("user");
-                let userEmail = null;
-                if (userInfo) {
-                  try {
-                    const parsedUser = JSON.parse(userInfo);
-                    userEmail = parsedUser.email;
-                  } catch {
-                    userEmail = null;
-                  }
+          </div>
+
+          {/* Discord Community Card */}
+          <div
+            className="p-4 bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl cursor-pointer hover:bg-[#5865F2]/15 transition-colors flex items-center gap-3"
+            onClick={() => {
+              const userInfo = localStorage.getItem("user");
+              let userEmail = null;
+              if (userInfo) {
+                try {
+                  const parsedUser = JSON.parse(userInfo);
+                  userEmail = parsedUser.email;
+                } catch {
+                  userEmail = null;
                 }
-                if (userEmail) {
-                  window.location.href = `http://localhost:5000/api/auth/discord/join?email=${encodeURIComponent(userEmail)}`;
-                } else {
-                  alert("Please login to join our Discord server.");
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyPress={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  const userInfo = localStorage.getItem("user");
-                  let userEmail = null;
-                  if (userInfo) {
-                    try {
-                      const parsedUser = JSON.parse(userInfo);
-                      userEmail = parsedUser.email;
-                    } catch {
-                      userEmail = null;
-                    }
-                  }
-                  if (userEmail) {
-                    window.location.href = `http://localhost:5000/api/auth/discord/join?email=${encodeURIComponent(userEmail)}`;
-                  } else {
-                    alert("Please login to join our Discord server.");
-                  }
-                }
-              }}
+              }
+              if (userEmail) {
+                window.location.href = `http://localhost:5000/api/auth/discord/join?email=${encodeURIComponent(userEmail)}`;
+              } else {
+                alert("Please log in to join our Discord community.");
+              }
+            }}
+          >
+            <svg
+              className="w-8 h-8 text-[#5865F2] shrink-0"
+              fill="currentColor"
+              viewBox="0 0 16 16"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-discord" viewBox="0 0 16 16" style={{ marginRight: "8px" }}>
-                <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-              </svg>
-              <span style={{ fontWeight: "bold", fontSize: "16px" }}>Join our Discord server</span>
+              <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
+            </svg>
+            <div>
+              <p className="text-xs font-bold text-foreground">Join Study Discord</p>
+              <p className="text-[11px] text-muted-foreground">Collaborate with peers & instructor</p>
             </div>
           </div>
-        </main>
+        </div>
       </div>
+
+      {showQuizModal && (
+        <QuizModal
+          moduleId={currentQuizModule}
+          onClose={() => setShowQuizModal(false)}
+          onResult={handleQuizResult}
+        />
+      )}
     </div>
   );
 }

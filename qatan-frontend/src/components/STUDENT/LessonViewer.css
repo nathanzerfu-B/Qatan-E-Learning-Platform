@@ -109,35 +109,38 @@ body.student-dark .quiz-submit {
 	background-color: #10b981;
 }
 
-/* Card / container */
+/* Cinema Video Container */
 .lv-media-wrap {
 	position: relative;
-	background-color: #ffffff; /* white card background for light theme */
-	border-radius: 0.5rem; /* rounded-lg */
+	background-color: #090d16;
+	border-radius: 1rem;
 	width: 100%;
-	max-width: 650px; /* make the card a fixed readable width inside the panel */
-	margin: 0 auto; /* center the card inside the panel */
+	max-width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	/* allow video to show full letterbox/pillarbox rather than cropping */
-	overflow: visible;
-	padding: 1rem;
+	overflow: hidden;
+	box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.student-dark .lv-media-wrap {
+	background-color: #000000 !important;
+	border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Placeholder when no lesson */
 .lv-placeholder {
 	position: relative;
-	background-color: #ffffff; /* placeholder uses white card background */
-	height: 400px;
+	background-color: #111827;
+	height: 440px;
 	width: 100%;
-	max-width: 600px; /* keep a reasonable max width */
-	box-sizing: border-box;
 	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 	align-items: center;
 	justify-content: center;
-	border-radius: 0.5rem;
-	margin: 0 auto; /* ensure placeholder centers inside its container */
+	border-radius: 1rem;
+	color: #9ca3af;
 }
 .lv-placeholder-btn {
 	width: 6rem; /* w-24 */
@@ -370,8 +373,51 @@ body.student-dark .lesson-item-active {
 	.lv-placeholder { height: 260px; max-width: 100%; }
 }
 
+/* Cinema Studio Layout */
+.lv-cinema-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+@media (min-width: 1024px) {
+  .lv-cinema-layout {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: 2rem;
+    padding: 1.5rem 2rem 4rem;
+  }
+}
+
+.lv-sidebar-sticky {
+  position: sticky;
+  top: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-right: 0.25rem;
+}
+
+.lv-top-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+body.student-dark .lv-top-nav-bar {
+  background-color: #111827;
+  border-bottom-color: #374151;
+}
+
 /* Page-level */
-.lv-page { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background-color: #f9fafb !important; color: #111827 !important; min-height: 100vh; }
+.lv-page { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background-color: #f8fafc !important; color: #111827 !important; min-height: 100vh; }
 .lv-page-inner { max-width: none; width: 100%; margin: 0; }
 .lv-main { padding: 1rem; }
 .lv-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
