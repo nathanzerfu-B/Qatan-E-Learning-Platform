@@ -343,16 +343,16 @@ function CourseOutline({
               className="module-toggle"
               onClick={() => toggleModule(module.id)}
             >
-              <div className="module-info">
-                <p className="module-title">{module.name}</p>
+              <div className="module-info min-w-0">
+                <p className="module-title truncate" title={module.name}>{module.name}</p>
                 <p className="module-sub">
                   {module.completedLessons}/{module.totalLessons} Lessons
                 </p>
               </div>
               {module.quizStatus === "passed" && (
-                <span className="module-passed">Quiz Passed</span>
+                <span className="module-passed shrink-0">Quiz Passed</span>
               )}
-              <span className="material-icons module-expand">
+              <span className="material-icons module-expand shrink-0">
                 {expandedModules[module.id] ? "expand_less" : "expand_more"}
               </span>
             </button>
@@ -413,6 +413,7 @@ function LessonItem({ lesson, isActive, onStart, onComplete }) {
       className={`lesson-item ${locked ? "lesson-locked" : ""} ${
         isActive ? "lesson-item-active" : ""
       }`}
+      title={name}
     >
       <span
         className={`lesson-name ${
@@ -420,15 +421,15 @@ function LessonItem({ lesson, isActive, onStart, onComplete }) {
         }`}
         onClick={!locked && status !== "completed" ? handleStart : undefined}
       >
-        {locked ? "🔒 " : isActive ? "▶️ " : ""}
-        {name}
+        <span className="shrink-0 mr-1.5">{locked ? "🔒" : isActive ? "▶️" : "📄"}</span>
+        <span className="truncate">{name}</span>
         {isActive && (
-          <span className="ml-2 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-primary/20 text-primary">
+          <span className="ml-1.5 text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#1c6048]/15 text-[#1c6048] dark:text-[#34d399] shrink-0">
             Playing
           </span>
         )}
       </span>
-      <div className="lesson-actions">
+      <div className="lesson-actions shrink-0">
         <span
           className={`lesson-status ${
             status === "completed" ? "lesson-completed" : "lesson-notstarted"
@@ -690,68 +691,105 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modules, setModules] = useState([]);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [lessonStatus, setLessonStatus] = useState("not-started");
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [currentQuizModule, setCurrentQuizModule] = useState(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const courseId = location.state?.courseId;
+        let courseId =
+          location.state?.courseId ||
+          new URLSearchParams(location.search).get("courseId") ||
+          new URLSearchParams(location.search).get("id");
+
+        const rawToken = localStorage.getItem("token");
+        const token = rawToken && rawToken !== "null" && rawToken !== "undefined" ? rawToken : null;
+        const authHeaders = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+        if (!courseId && token) {
+          try {
+            const enrollRes = await axios.get(
+              "http://localhost:5000/api/enrollments",
+              authHeaders
+            );
+            if (enrollRes.data?.success && enrollRes.data.enrollments?.length > 0) {
+              courseId =
+                enrollRes.data.enrollments[0].courseId ||
+                enrollRes.data.enrollments[0].course?.id;
+            }
+          } catch (e) {
+            console.warn("Fallback enrollment fetch failed:", e);
+          }
+        }
+
+        if (!courseId) {
+          try {
+            const publicRes = await axios.get("http://localhost:5000/api/courses");
+            if (publicRes.data?.success && publicRes.data.courses?.length > 0) {
+              const bestCourse = publicRes.data.courses.find((c) => c.id === 12) || publicRes.data.courses[0];
+              courseId = bestCourse.id;
+            }
+          } catch (e) {
+            console.warn("Fallback public course fetch failed:", e);
+          }
+        }
+
         if (!courseId) {
           setError("No course selected");
           setLoading(false);
           return;
         }
 
-        const token = localStorage.getItem("token");
         const courseResponse = await axios.get(
           `http://localhost:5000/api/courses/${courseId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          authHeaders
         );
 
-        if (courseResponse.data.success) {
-          setCourse(courseResponse.data.course);
+        if (courseResponse.data?.success && courseResponse.data.course) {
+          const courseData = courseResponse.data.course;
+          setCourse(courseData);
 
-          // Fetch progress
-          const progressResponse = await axios.get(
-            `http://localhost:5000/api/progress/course/${courseId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
+          let progressData = null;
+          if (token) {
+            try {
+              const progressResponse = await axios.get(
+                `http://localhost:5000/api/progress/course/${courseId}`,
+                authHeaders
+              );
+              if (progressResponse.data?.success) {
+                progressData = progressResponse.data.progress;
+              }
+            } catch (pErr) {
+              console.warn("Progress fetch skipped or not available:", pErr);
             }
-          );
+          }
 
-          if (progressResponse.data.success) {
-            const progressData = progressResponse.data.progress;
+          const rawModules = courseData.modules || [];
+          const modulesWithQuizStatus = await Promise.all(
+            rawModules.map(async (module) => {
+              const moduleProgress = progressData?.modules?.find(
+                (m) => m.module?.id === module.id || m.moduleId === module.id
+              );
 
-            // Fetch quiz statuses for all modules
-            const modulesWithQuizStatus = await Promise.all(
-              courseResponse.data.course.modules.map(async (module) => {
-                const moduleProgress = progressData.modules.find(
-                  (m) => m.module.id === module.id
-                );
-
-                // Check if student has passed the quiz for this module
-                let quizStatus = "available";
+              let quizStatus = "available";
+              if (token) {
                 try {
                   const quizResponse = await axios.get(
                     `http://localhost:5000/api/quizzes/module/${module.id}`,
-                    {
-                      headers: { Authorization: `Bearer ${token}` },
-                    }
+                    authHeaders
                   );
 
-                  if (quizResponse.data.success && quizResponse.data.quiz) {
+                  if (quizResponse.data?.success && quizResponse.data.quiz) {
                     const quizId = quizResponse.data.quiz.id;
-
-                    // Check if student has an attempt for this quiz via the new API
                     const attemptResponse = await axios.get(
                       `http://localhost:5000/api/quizzes/${quizId}/student-attempt`,
-                      {
-                        headers: { Authorization: `Bearer ${token}` },
-                      }
+                      authHeaders
                     );
 
-                    if (attemptResponse.data.success) {
+                    if (attemptResponse.data?.success) {
                       const attempt = attemptResponse.data.attempt;
                       if (!attempt) {
                         quizStatus = "available";
@@ -759,51 +797,51 @@ export default function App() {
                         quizStatus = "passed";
                       } else if (attempt.status === "failed") {
                         quizStatus = "failed";
-                      } else {
-                        // fallback
-                        quizStatus = "available";
                       }
-                    } else {
-                      quizStatus = "available";
                     }
                   }
-                } catch (error) {
-                  console.error(
-                    `Error fetching quiz status for module ${module.id}:`,
-                    error
-                  );
+                } catch {
+                  quizStatus = "available";
                 }
+              }
 
-                return {
-                  id: module.id,
-                  name: module.title,
-                  totalLessons: module.lessons.length,
-                  completedLessons: moduleProgress
-                    ? moduleProgress.completedCount
-                    : 0,
-                  quizStatus: quizStatus,
-                  locked: false, // TODO: Implement locking logic
-                  lessons: module.lessons.map((lesson) => {
-                    const lessonProgress = moduleProgress?.lessons.find(
-                      (l) => l.id === lesson.id
-                    )?.progress;
-                    return {
-                      id: lesson.id,
-                      name: lesson.title,
-                      moduleName: module.title,
-                      moduleId: module.id,
-                      status: lessonProgress
-                        ? lessonProgress.status
-                        : "not-started",
-                      locked: false, // TODO: Implement locking
-                      mediaSrc: lesson.mediaUrl || "/img/default-lesson.png",
-                    };
-                  }),
-                };
-              })
-            );
-            console.debug("Modules with quiz status fetched:", modulesWithQuizStatus);
-            setModules(modulesWithQuizStatus);
+              return {
+                id: module.id,
+                name: module.title,
+                totalLessons: module.lessons ? module.lessons.length : 0,
+                completedLessons: moduleProgress
+                  ? moduleProgress.completedCount || 0
+                  : 0,
+                quizStatus: quizStatus,
+                locked: false,
+                lessons: (module.lessons || []).map((lesson) => {
+                  const lessonProgress = moduleProgress?.lessons?.find(
+                    (l) => l.id === lesson.id
+                  )?.progress;
+                  return {
+                    id: lesson.id,
+                    name: lesson.title,
+                    moduleName: module.title,
+                    moduleId: module.id,
+                    status: lessonProgress
+                      ? lessonProgress.status
+                      : "not-started",
+                    locked: false,
+                    mediaSrc: lesson.mediaUrl || "/img/default-lesson.png",
+                  };
+                }),
+              };
+            })
+          );
+
+          setModules(modulesWithQuizStatus);
+
+          // Automatically select first lesson if available and none selected yet
+          if (
+            modulesWithQuizStatus.length > 0 &&
+            modulesWithQuizStatus[0].lessons?.length > 0
+          ) {
+            setCurrentLesson((prev) => prev || modulesWithQuizStatus[0].lessons[0]);
           }
         } else {
           setError("Course not found");
@@ -817,14 +855,7 @@ export default function App() {
     };
 
     fetchCourseData();
-  }, [location.state]);
-
-  // Set initial state for first time user with no course taken
-  const [currentLesson, setCurrentLesson] = useState(null);
-  const [lessonStatus, setLessonStatus] = useState("not-started");
-  const [overallProgress, setOverallProgress] = useState(0); // 0% progress for first time user
-  const [showQuizModal, setShowQuizModal] = useState(false);
-  const [currentQuizModule, setCurrentQuizModule] = useState(null);
+  }, [location.state, location.search]);
 
   const handleLessonStart = async (lesson) => {
     if (!lesson.locked) {
@@ -1036,7 +1067,7 @@ export default function App() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/student/courses")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground transition-all"
+            className="lv-top-nav-back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
           >
             ← Back to Courses
           </button>
@@ -1148,17 +1179,18 @@ export default function App() {
         </div>
 
         {/* Right Column: Sticky Curriculum Sidebar */}
-        <div className="lv-sidebar-sticky">
-          <div className="p-5 bg-card rounded-2xl border border-border/80 shadow-sm space-y-4">
+        {/* Right Column: Sticky Curriculum Sidebar */}
+        <div className="lv-sidebar-sticky w-full min-w-0">
+          <div className="p-4 sm:p-5 bg-card rounded-2xl border border-border/80 shadow-sm space-y-4 w-full box-border overflow-hidden">
             <div className="flex items-center justify-between pb-3 border-b border-border/60">
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Course Content</h3>
-                <span className="text-[11px] text-muted-foreground">
+              <div className="min-w-0 flex-1 mr-2">
+                <h3 className="text-sm font-bold text-foreground truncate">Course Content</h3>
+                <span className="text-[11px] text-muted-foreground truncate block">
                   {modules.reduce((sum, m) => sum + m.completedLessons, 0)} of{" "}
                   {modules.reduce((sum, m) => sum + m.totalLessons, 0)} lessons completed
                 </span>
               </div>
-              <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
+              <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">
                 {overallProgress}%
               </span>
             </div>
@@ -1175,7 +1207,7 @@ export default function App() {
 
           {/* Discord Community Card */}
           <div
-            className="p-4 bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl cursor-pointer hover:bg-[#5865F2]/15 transition-colors flex items-center gap-3"
+            className="lv-discord-card p-3.5 sm:p-4 bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl cursor-pointer hover:bg-[#5865F2]/15 transition-all flex items-center gap-3 overflow-hidden w-full box-border"
             onClick={() => {
               const userInfo = localStorage.getItem("user");
               let userEmail = null;
@@ -1193,18 +1225,34 @@ export default function App() {
                 alert("Please log in to join our Discord community.");
               }
             }}
+            title="Join Study Discord Community"
           >
-            <svg
-              className="w-8 h-8 text-[#5865F2] shrink-0"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
-            </svg>
-            <div>
-              <p className="text-xs font-bold text-foreground">Join Study Discord</p>
-              <p className="text-[11px] text-muted-foreground">Collaborate with peers & instructor</p>
+            <div className="lv-discord-icon-wrap w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] shrink-0 flex items-center justify-center rounded-xl bg-[#5865F2]/15 text-[#5865F2]">
+              <svg
+                width="22"
+                height="22"
+                className="shrink-0 text-[#5865F2]"
+                style={{
+                  width: "22px",
+                  height: "22px",
+                  minWidth: "22px",
+                  minHeight: "22px",
+                  maxWidth: "22px",
+                  maxHeight: "22px",
+                  flexShrink: 0,
+                  display: "block",
+                }}
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
+              </svg>
             </div>
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="text-xs font-bold text-foreground truncate">Join Study Discord</p>
+              <p className="text-[11px] text-muted-foreground truncate">Collaborate with peers & instructor</p>
+            </div>
+            <span className="text-[#5865F2] text-xs font-bold shrink-0 ml-auto">→</span>
           </div>
         </div>
       </div>

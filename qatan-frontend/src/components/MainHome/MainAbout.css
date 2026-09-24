@@ -6,10 +6,61 @@
 /* Card hover and border enhancements */
 .about-page .Main-card {
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .about-page .Main-card:hover {
   transform: translateY(-2px);
+}
+
+/* Defensive styling for team avatars - completely eliminates image overflow */
+.about-team-avatar-wrapper {
+  position: relative !important;
+  width: 80px !important;
+  height: 80px !important;
+  min-width: 80px !important;
+  min-height: 80px !important;
+  max-width: 80px !important;
+  max-height: 80px !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 1rem !important;
+  box-sizing: border-box !important;
+  border: 2px solid #a8b2d2 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .about-team-avatar-wrapper {
+  border-color: #4b5563 !important;
+}
+
+@media (min-width: 640px) {
+  .about-team-avatar-wrapper {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
+    max-width: 96px !important;
+    max-height: 96px !important;
+  }
+}
+
+.about-team-avatar-img,
+.about-team-avatar-wrapper img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 9999px !important;
+  display: block !important;
 }
 
 /* Responsive adjustments */

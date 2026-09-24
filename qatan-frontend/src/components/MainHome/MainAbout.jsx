@@ -197,12 +197,12 @@ export default function About() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
-          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center">
-            <div className="relative mb-4">
+          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center overflow-hidden">
+            <div className="about-team-avatar-wrapper mb-4">
               <img
                 src="/img/1.png"
                 alt="John Doe"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-sm border-2 border-[#a8b2d2] dark:border-[#4b5563]"
+                className="about-team-avatar-img"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/img/student/student photo.png";
@@ -214,12 +214,12 @@ export default function About() {
             <p className="text-xs text-muted-foreground leading-relaxed">10+ years specializing in full-stack architecture and interactive student curriculum.</p>
           </div>
 
-          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center">
-            <div className="relative mb-4">
+          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center overflow-hidden">
+            <div className="about-team-avatar-wrapper mb-4">
               <img
                 src="/img/2.png"
                 alt="Jane Smith"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-sm border-2 border-[#a8b2d2] dark:border-[#4b5563]"
+                className="about-team-avatar-img"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/img/student/student photo.png";
@@ -231,12 +231,12 @@ export default function About() {
             <p className="text-xs text-muted-foreground leading-relaxed">Designs modular course learning progressions, practical milestones, and quiz benchmarks.</p>
           </div>
 
-          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center sm:col-span-2 md:col-span-1">
-            <div className="relative mb-4">
+          <div className="Main-card p-6 sm:p-7 text-center rounded-2xl flex flex-col items-center sm:col-span-2 md:col-span-1 overflow-hidden">
+            <div className="about-team-avatar-wrapper mb-4">
               <img
                 src="/img/3.png"
                 alt="Emily White"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-sm border-2 border-[#a8b2d2] dark:border-[#4b5563]"
+                className="about-team-avatar-img"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/img/student/student photo.png";
