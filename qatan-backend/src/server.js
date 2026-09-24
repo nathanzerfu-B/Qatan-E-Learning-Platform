@@ -11,10 +11,13 @@ import discordAuthRoutes from "./routes/discordAuth.js";
 import instructorApplicationsRoutes from "./routes/instructorApplications.js";
 import cloudinary from "./utils/cloudinary.js";
 import { generalApiLimiter, securityHeaders, permissionsPolicy } from "./middleware/securityMiddleware.js";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import { errorHandler, notFoundHandler, setupProcessErrorHandlers } from "./middleware/errorHandler.js";
 
 // 🧱 Load environment variables
 dotenv.config();
+
+// 🛡️ Global Process Error Safety Nets
+setupProcessErrorHandlers();
 
 // 🧠 Initialize express and prisma
 const app = express();

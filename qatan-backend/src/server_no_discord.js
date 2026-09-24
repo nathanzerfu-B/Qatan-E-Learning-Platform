@@ -41,6 +41,13 @@ app.use("/api/quizzes", quizRoutes);
 // ✅ Course Routes
 app.use("/api/courses", courseRoutes);
 
+// 🛡️ Centralized 404 & Safe Error Handling Middlewares
+import { errorHandler, notFoundHandler, setupProcessErrorHandlers } from "./middleware/errorHandler.js";
+setupProcessErrorHandlers();
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 // 🚀 Start Server (ALWAYS at the very bottom)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
