@@ -12,18 +12,18 @@ body {
   --secondary-text: #4b5563;
   --muted-text: #6b7280;
   --label-color: #374151;
-  --card-bg: rgba(255,255,255,0.2);
-  --border-color: rgba(255,255,255,0.2);
-  --button-bg: rgba(59,130,246,0.8);
+  --card-bg: #ffffff;
+  --border-color: #a8b2d2;
+  --button-bg: #1c6048;
   --button-color: white;
-  --nav-bg: rgba(255,255,255,0.84);
-  --link-color: black;
-  --active-link: rgb(42,128,202);
-  --primary-color: #3b82f6;
-  --primary-focus: rgba(59,130,246,0.5);
-  --card-hover: rgba(255,255,255,0.3);
-  --button-hover: rgba(37,99,235,0.9);
-  --button-border: rgba(59,130,246,0.2);
+  --nav-bg: rgba(255,255,255,0.92);
+  --link-color: #1f2937;
+  --active-link: #1c6048;
+  --primary-color: #1c6048;
+  --primary-focus: rgba(28, 96, 72, 0.4);
+  --card-hover: #f9fafb;
+  --button-hover: #164e3a;
+  --button-border: rgba(28, 96, 72, 0.2);
   --padding: 20px;
   --grid-gap: 24px;
   --card-padding: 32px;
@@ -47,19 +47,18 @@ body {
 }
 
 .student-dark {
-  --bg-color: #1a1a1a;
-  --text-color: #ffffff;
-  --secondary-text: #ffffff;
-  --muted-text: #ffffff;
-  --label-color: #ffffff;
-  /* slightly lighten the card and use a lighter border so it shows on dark backgrounds */
-  --card-bg: rgba(255,255,255,0.03);
-  --border-color: rgba(255,255,255,0.12);
-  --button-bg: rgba(59,130,246,0.8);
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --secondary-text: #94a3b8;
+  --muted-text: #64748b;
+  --label-color: #f1f5f9;
+  --card-bg: #1e293b;
+  --border-color: #4b5563;
+  --button-bg: #1c6048;
   --button-color: white;
-  --nav-bg: #000000;
-  --link-color: white;
-  --active-link: rgb(42,128,202);
+  --nav-bg: #0f172a;
+  --link-color: #e2e8f0;
+  --active-link: #34d399;
 }
 
 .student-dark .student-sidebar {
@@ -131,7 +130,7 @@ body {
   }
 
   .student-main-content {
-    padding-top: 0;
+    padding-top: 4.5rem;
   }
 
   /* Dark mode mobile menu */

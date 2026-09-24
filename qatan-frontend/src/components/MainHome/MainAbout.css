@@ -1,96 +1,21 @@
-/* Scoped styles for About page only. Keeps desktop/tablet layout intact; enforces vertical stacking on small screens */
+/* Scoped styles for About page */
 .about-page {
-  --about: 1;
+  box-sizing: border-box;
 }
 
-/* Mobile-first vertical stacking for About page */
-@media (max-width: 767px) {
-
-  /* Make primary sections stack vertically and remove grid/side-by-side */
-  .about-page .Main-md\:grid,
-  .about-page .Main-md\:grid-cols-2,
-  .about-page .Main-md\:grid-cols-3,
-  .about-page .Main-md\:text-5xl {
-    display: block !important;
-    grid-template-columns: none !important;
-  }
-
-  /* Force any .Main-flex Main-md:grid sections to be column on mobile */
-  .about-page .Main-flex.Main-md\:grid,
-  .about-page section.Main-flex.Main-md\:grid {
-    display: block !important;
-  }
-
-  /* Cards should be full width and stacked */
-  .about-page .Main-card {
-    width: 100% !important;
-    box-sizing: border-box;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  /* Team grid: show single column list */
-  .about-page .Main-grid.Main-md\:grid-cols-3,
-  .about-page .Main-grid.Main-grid-cols-1,
-  .about-page .Main-grid.Main-md\:grid-cols-3>* {
-    grid-template-columns: 1fr !important;
-    width: 100% !important;
-    display: block !important;
-  }
-
-  /* Reduce gaps for mobile comfort */
-  .about-page .Main-gap-8,
-  .about-page .Main-gap-6 {
-    gap: 1rem !important;
-  }
-
-  /* Add gap between Our Mission and Our Values cards on mobile */
-  .about-page section:nth-child(2) .Main-card:first-child {
-    margin-bottom: 2rem !important;
-  }
-
-  /* Add gap between Our Team cards on mobile */
-  .about-page section:nth-child(3) .Main-card:not(:last-child) {
-    margin-bottom: 2rem !important;
-  }
-
-  /* Add gap between Contact Us cards on mobile */
-  .about-page section:nth-child(4) .Main-card:first-child {
-    margin-bottom: 2rem !important;
-  }
-
-  /* Make avatars smaller on mobile to fit the vertical layout */
-  .about-page .Main-w-20 {
-    width: 3.5rem !important;
-  }
-
-  .about-page .Main-h-20 {
-    height: 3.5rem !important;
-  }
-
-  /* Ensure forms and inputs take full width */
-  .about-page .Main-space-y-4 input,
-  .about-page .Main-space-y-4 textarea,
-  .about-page .Main-w-full {
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  /* Center headings and reduce font sizes slightly on small screens */
-  .about-page .Main-text-3xl {
-    font-size: 1.5rem !important;
-  }
-
-  .about-page .Main-text-2xl {
-    font-size: 1.25rem !important;
-  }
+/* Card hover and border enhancements */
+.about-page .Main-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* No changes outside mobile; desktop/tablet use existing styles */
+.about-page .Main-card:hover {
+  transform: translateY(-2px);
+}
 
-/* Make Our Values card slightly wider on PC and tablet view */
-@media (min-width: 768px) {
-  .about-page section:nth-child(2) {
-    grid-template-columns: 1fr 1.2fr !important;
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .about-page {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 }

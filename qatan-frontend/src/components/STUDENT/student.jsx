@@ -116,22 +116,22 @@ const Student = () => {
     ];
 
     return (
-      <div className="min-h-screen bg-background text-foreground p-6 sm:p-8 space-y-8 text-left">
+      <div className="max-w-7xl mx-auto w-full space-y-8 sm:space-y-10 text-left">
         {/* Welcome Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
           <div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate("/")}
-              className="mb-3 gap-2 text-muted-foreground hover:text-foreground"
+              className="mb-3 gap-2 text-muted-foreground hover:text-foreground border-[#a8b2d2] dark:border-[#4b5563]"
             >
               ← Back to Main
             </Button>
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               Welcome back, {user?.name || "Student"}! 👋
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               Track your learning momentum, course milestones, and certificates.
             </p>
           </div>
@@ -140,7 +140,7 @@ const Student = () => {
               variant="outline"
               size="default"
               onClick={() => navigate("/courses")}
-              className="shadow-sm font-medium"
+              className="shadow-sm font-medium border-[#a8b2d2] dark:border-[#4b5563]"
             >
               Browse Catalog
             </Button>
@@ -148,7 +148,7 @@ const Student = () => {
               variant="default"
               size="default"
               onClick={() => setActiveAndClose("courses")}
-              className="shadow-sm font-semibold"
+              className="shadow-sm font-semibold bg-[#1c6048] hover:bg-[#164e3a] text-white"
             >
               My Courses
             </Button>
@@ -156,94 +156,100 @@ const Student = () => {
         </div>
 
         {/* 4 Responsive KPI Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {/* Metric 1: Enrolled */}
-          <Card className="hover:border-primary/50 transition-all hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048] dark:hover:border-[#34d399] transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-5 sm:p-6">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Enrolled Courses
               </CardTitle>
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+              <div className="p-2.5 rounded-xl bg-[#1c6048]/10 text-[#1c6048] dark:text-[#34d399]">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold tracking-tight text-foreground">
+            <CardContent className="p-5 sm:p-6 pt-0">
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
                 {loading ? "..." : enrolledCount}
               </div>
-              <div className="mt-2 flex items-center gap-1.5">
-                <Badge variant="primary" className="text-[11px]">Active</Badge>
+              <div className="mt-2.5 flex items-center gap-1.5">
+                <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#1c6048]/10 text-[#1c6048] dark:text-[#34d399]">
+                  Active
+                </span>
                 <span className="text-xs text-muted-foreground">Total registered</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Metric 2: In Progress */}
-          <Card className="hover:border-blue-500/50 transition-all hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048] dark:hover:border-[#34d399] transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-5 sm:p-6">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 In Progress
               </CardTitle>
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+              <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold tracking-tight text-foreground">
+            <CardContent className="p-5 sm:p-6 pt-0">
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
                 {loading ? "..." : inProgressCount}
               </div>
-              <div className="mt-2 flex items-center gap-1.5">
-                <Badge variant="secondary" className="text-[11px]">Learning</Badge>
-                <span className="text-xs text-muted-foreground">Currently studying</span>
+              <div className="mt-2.5 flex items-center gap-1.5">
+                <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  Studying
+                </span>
+                <span className="text-xs text-muted-foreground">Currently learning</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Metric 3: Completed */}
-          <Card className="hover:border-emerald-500/50 transition-all hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048] dark:hover:border-[#34d399] transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-5 sm:p-6">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Completed
               </CardTitle>
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold tracking-tight text-foreground">
+            <CardContent className="p-5 sm:p-6 pt-0">
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
                 {loading ? "..." : completedCount}
               </div>
-              <div className="mt-2 flex items-center gap-1.5">
-                <Badge variant="success" className="text-[11px]">Certificates</Badge>
+              <div className="mt-2.5 flex items-center gap-1.5">
+                <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  Certificates
+                </span>
                 <span className="text-xs text-muted-foreground">Verified finishes</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Metric 4: Avg Progress */}
-          <Card className="hover:border-amber-500/50 transition-all hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
+          <Card className="border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048] dark:hover:border-[#34d399] transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 p-5 sm:p-6">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Avg. Completion
               </CardTitle>
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold tracking-tight text-foreground">
+            <CardContent className="p-5 sm:p-6 pt-0">
+              <div className="text-3xl font-extrabold tracking-tight text-foreground">
                 {loading ? "..." : `${avgProgress}%`}
               </div>
-              <div className="mt-2 space-y-1">
+              <div className="mt-2.5 space-y-1">
                 <Progress value={avgProgress} className="h-1.5" />
                 <span className="text-[11px] text-muted-foreground">Overall completion index</span>
               </div>
@@ -252,31 +258,31 @@ const Student = () => {
         </div>
 
         {/* Hero "Jump Back In" Card & Learning Streak Widget */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {/* Main Jump Back In Card (2 Columns) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex">
             {currentActive ? (
-              <Card className="overflow-hidden border-primary/20 shadow-md">
-                <div className="p-6 sm:p-7 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                  <div className="relative w-full sm:w-48 aspect-video rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner">
+              <Card className="overflow-hidden border-[#a8b2d2] dark:border-[#4b5563] shadow-sm w-full flex flex-col justify-center">
+                <div className="p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-center">
+                  <div className="relative w-full sm:w-56 md:w-60 aspect-video rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner border border-[#a8b2d2]/40 dark:border-[#4b5563]/40">
                     <img
                       src={currentActive.course.thumbnailUrl || "/img/student/python.png"}
                       alt={currentActive.course.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-2 left-2">
-                      <Badge variant="secondary" className="backdrop-blur bg-background/80 text-[10px]">
+                    <div className="absolute top-2.5 left-2.5">
+                      <span className="backdrop-blur bg-background/90 text-foreground text-[10px] font-semibold py-0.5 px-2 rounded-full shadow-sm">
                         {currentActive.course.category || "Course"}
-                      </Badge>
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex-1 space-y-3 w-full">
+                  <div className="flex-1 space-y-4 w-full">
                     <div>
-                      <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                      <span className="text-xs font-bold text-[#1c6048] dark:text-[#34d399] uppercase tracking-wider">
                         Resume Where You Left Off
                       </span>
-                      <h2 className="text-xl font-bold text-foreground mt-0.5 leading-snug">
+                      <h2 className="text-xl font-bold text-foreground mt-1 leading-snug">
                         {currentActive.course.title}
                       </h2>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
@@ -300,7 +306,7 @@ const Student = () => {
                             state: { courseId: currentActive.course.id },
                           })
                         }
-                        className="font-semibold shadow-sm"
+                        className="font-semibold shadow-sm bg-[#1c6048] hover:bg-[#164e3a] text-white px-4"
                       >
                         ▶ Resume Lesson
                       </Button>
@@ -308,7 +314,7 @@ const Student = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => setActiveAndClose("courses")}
-                        className="text-xs text-muted-foreground hover:text-foreground"
+                        className="text-xs text-muted-foreground hover:text-foreground font-medium"
                       >
                         All My Courses →
                       </Button>
@@ -317,8 +323,8 @@ const Student = () => {
                 </div>
               </Card>
             ) : (
-              <Card className="p-8 text-center flex flex-col items-center justify-center h-full">
-                <div className="p-4 rounded-full bg-primary/10 text-primary mb-3">
+              <Card className="p-8 text-center flex flex-col items-center justify-center w-full border-[#a8b2d2] dark:border-[#4b5563]">
+                <div className="p-4 rounded-full bg-[#1c6048]/10 text-[#1c6048] dark:text-[#34d399] mb-3">
                   <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
@@ -327,7 +333,7 @@ const Student = () => {
                 <p className="text-sm text-muted-foreground mt-1 max-w-md">
                   You haven't enrolled in any courses yet. Choose from dozens of top-rated courses and earn certificates.
                 </p>
-                <Button className="mt-4" onClick={() => navigate("/courses")}>
+                <Button className="mt-4 bg-[#1c6048] hover:bg-[#164e3a] text-white" onClick={() => navigate("/courses")}>
                   Explore Course Catalog
                 </Button>
               </Card>
@@ -335,19 +341,21 @@ const Student = () => {
           </div>
 
           {/* Learning Streak & Weekly Goal (1 Column) */}
-          <Card className="flex flex-col justify-between">
-            <CardHeader className="pb-3">
+          <Card className="flex flex-col justify-between border-[#a8b2d2] dark:border-[#4b5563] shadow-sm">
+            <CardHeader className="pb-3 p-6">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-bold text-foreground flex items-center gap-1.5">
                   <span>🔥</span> Weekly Streak
                 </CardTitle>
-                <Badge variant="warning" className="text-[11px]">4 Days Active</Badge>
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  4 Days Active
+                </span>
               </div>
               <CardDescription>
                 Keep your momentum alive with daily practice.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-6 pt-0">
               <div className="flex justify-between items-center gap-1">
                 {weekDays.map((item, idx) => (
                   <div key={idx} className="flex flex-col items-center gap-1.5">
@@ -355,7 +363,7 @@ const Student = () => {
                     <div
                       className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                         item.active
-                          ? "bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20"
+                          ? "bg-[#1c6048] text-white shadow-sm ring-2 ring-[#1c6048]/20"
                           : "bg-secondary text-muted-foreground"
                       }`}
                     >
@@ -364,7 +372,7 @@ const Student = () => {
                   </div>
                 ))}
               </div>
-              <div className="p-3 rounded-lg bg-muted/60 border border-border/50 text-xs text-muted-foreground">
+              <div className="p-3.5 rounded-xl bg-muted/60 border border-[#a8b2d2]/40 dark:border-[#4b5563]/40 text-xs text-muted-foreground leading-relaxed">
                 <span className="font-semibold text-foreground">Tip: </span>
                 Completing 1 lesson per day increases your completion probability by 74%!
               </div>
@@ -373,17 +381,17 @@ const Student = () => {
         </div>
 
         {/* Recent Activity Card */}
-        <Card>
-          <CardHeader>
+        <Card className="border-[#a8b2d2] dark:border-[#4b5563] shadow-sm">
+          <CardHeader className="p-6">
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>
               Your latest interactions, completed modules, and quiz checkpoints.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
+          <CardContent className="p-6 pt-0">
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#a8b2d2]/40 dark:before:bg-[#4b5563]/40">
               <div className="relative flex items-start gap-4">
-                <div className="absolute -left-[27px] mt-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-primary ring-2 ring-primary/20" />
+                <div className="absolute -left-[27px] mt-1 h-3.5 w-3.5 rounded-full border-2 border-background bg-[#1c6048] ring-2 ring-[#1c6048]/20" />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-foreground">Completed lesson: Introduction to React</p>
                   <p className="text-xs text-muted-foreground mt-0.5">2 hours ago</p>
@@ -461,15 +469,15 @@ const Student = () => {
     });
 
     return (
-      <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 lg:p-8 space-y-6 text-left max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto w-full space-y-8 text-left">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
           <div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate("/")}
-              className="mb-2 gap-2 text-muted-foreground hover:text-foreground text-xs"
+              className="mb-2 gap-2 text-muted-foreground hover:text-foreground text-xs border-[#a8b2d2] dark:border-[#4b5563]"
             >
               ← Back to Main
             </Button>
@@ -484,23 +492,23 @@ const Student = () => {
             variant="outline"
             size="sm"
             onClick={() => navigate("/courses")}
-            className="shadow-sm font-medium self-start sm:self-auto text-xs"
+            className="shadow-sm font-semibold self-start sm:self-auto text-xs border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048]"
           >
             + Enroll in More Courses
           </Button>
         </div>
 
         {/* Filter and Search Bar */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-border pb-3">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#a8b2d2]/40 dark:border-[#4b5563]/40 pb-4">
           {/* Status Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <button
               type="button"
               onClick={() => setFilterStatus("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 filterStatus === "all"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+                  ? "bg-[#1c6048] text-white shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent border border-[#a8b2d2]/40 dark:border-[#4b5563]/40"
               }`}
             >
               All ({enrollments.length})
@@ -508,10 +516,10 @@ const Student = () => {
             <button
               type="button"
               onClick={() => setFilterStatus("in_progress")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 filterStatus === "in_progress"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+                  ? "bg-[#1c6048] text-white shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent border border-[#a8b2d2]/40 dark:border-[#4b5563]/40"
               }`}
             >
               In Progress ({inProgressCount})
@@ -519,10 +527,10 @@ const Student = () => {
             <button
               type="button"
               onClick={() => setFilterStatus("completed")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 filterStatus === "completed"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-secondary text-secondary-foreground hover:bg-accent"
+                  ? "bg-[#1c6048] text-white shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-accent border border-[#a8b2d2]/40 dark:border-[#4b5563]/40"
               }`}
             >
               Completed ({completedCount})
@@ -536,10 +544,10 @@ const Student = () => {
               placeholder="Search your courses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-lg border border-border bg-card text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full h-10 pl-9 pr-8 rounded-xl border border-[#a8b2d2] dark:border-[#4b5563] bg-card text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#1c6048]"
             />
             <svg
-              className="search-icon absolute left-3 top-2.5 text-muted-foreground"
+              className="search-icon absolute left-3 top-3 text-muted-foreground"
               width="16"
               height="16"
               style={{
@@ -577,11 +585,11 @@ const Student = () => {
 
         {/* Courses Grid: 4 columns on large screens, compact card proportions */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <CourseSkeleton count={8} />
           </div>
         ) : filtered.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card className="p-12 text-center border-[#a8b2d2] dark:border-[#4b5563]">
             <div className="p-4 rounded-full bg-muted w-14 h-14 mx-auto flex items-center justify-center text-muted-foreground mb-3">
               <svg
                 width="24"
@@ -602,24 +610,24 @@ const Student = () => {
                 : "You don't have any courses in this category yet."}
             </p>
             {searchQuery ? (
-              <Button size="sm" variant="outline" onClick={() => setSearchQuery("")}>
+              <Button size="sm" variant="outline" className="border-[#a8b2d2] dark:border-[#4b5563]" onClick={() => setSearchQuery("")}>
                 Clear Search
               </Button>
             ) : (
-              <Button size="sm" onClick={() => navigate("/courses")}>
+              <Button size="sm" className="bg-[#1c6048] hover:bg-[#164e3a] text-white" onClick={() => navigate("/courses")}>
                 Browse Catalog
               </Button>
             )}
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filtered.map((enrollment) => {
               const isCompleted =
                 enrollment.progress === 100 || enrollment.status === "completed";
               return (
                 <Card
                   key={enrollment.id}
-                  className="overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 hover:border-primary/50 group rounded-xl"
+                  className="overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 border-[#a8b2d2] dark:border-[#4b5563] hover:border-[#1c6048] dark:hover:border-[#34d399] group rounded-2xl"
                 >
                   {/* Controlled height thumbnail */}
                   <div className="relative h-36 sm:h-40 w-full overflow-hidden bg-muted">
@@ -631,37 +639,37 @@ const Student = () => {
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute top-2.5 left-2.5">
-                      <Badge
-                        variant="secondary"
-                        className="backdrop-blur bg-background/90 text-[10px] shadow-sm font-medium py-0 px-2"
-                      >
+                      <span className="backdrop-blur bg-background/90 text-foreground text-[10px] shadow-sm font-medium py-0.5 px-2 rounded-full">
                         {enrollment.course.category || "General"}
-                      </Badge>
+                      </span>
                     </div>
                     <div className="absolute top-2.5 right-2.5">
-                      <Badge
-                        variant={isCompleted ? "success" : "default"}
-                        className="text-[10px] py-0 px-2 font-semibold"
+                      <span
+                        className={`text-[10px] py-0.5 px-2 font-semibold rounded-full shadow-sm ${
+                          isCompleted
+                            ? "bg-emerald-500 text-white"
+                            : "bg-[#1c6048] text-white"
+                        }`}
                       >
                         {isCompleted ? "Completed" : "In Progress"}
-                      </Badge>
+                      </span>
                     </div>
                   </div>
 
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-sm font-bold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
+                    <h3 className="text-sm font-bold text-foreground line-clamp-1 mb-1.5 group-hover:text-[#1c6048] dark:group-hover:text-[#34d399] transition-colors">
                       {enrollment.course.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-3 flex-1 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1 leading-relaxed">
                       {enrollment.course.description}
                     </p>
 
-                    <div className="mt-auto space-y-3 pt-2.5 border-t border-border">
+                    <div className="mt-auto space-y-3 pt-3 border-t border-[#a8b2d2]/40 dark:border-[#4b5563]/40">
                       <Progress
                         value={enrollment.progress || 0}
                         showLabel
                         indicatorClassName={
-                          isCompleted ? "bg-emerald-500" : "bg-primary"
+                          isCompleted ? "bg-emerald-500" : "bg-[#1c6048]"
                         }
                       />
 
@@ -671,7 +679,7 @@ const Student = () => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10 font-medium text-[11px] h-7 px-2"
+                            className="text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10 font-medium text-[11px] h-7 px-2.5"
                             onClick={() =>
                               setSelectedCertificate({
                                 courseTitle: enrollment.course.title,
@@ -688,7 +696,9 @@ const Student = () => {
                         <Button
                           variant={isCompleted ? "secondary" : "default"}
                           size="sm"
-                          className="ml-auto font-semibold text-xs h-7 px-3"
+                          className={`ml-auto font-semibold text-xs h-7 px-3.5 ${
+                            !isCompleted ? "bg-[#1c6048] hover:bg-[#164e3a] text-white" : ""
+                          }`}
                           onClick={() =>
                             navigate("/student/lesson", {
                               state: { courseId: enrollment.course.id },
@@ -1642,7 +1652,7 @@ const Student = () => {
         />
       )}
       <div
-        className="student-main-content min-h-screen p-5"
+        className="student-main-content min-h-screen p-4 sm:p-6 lg:p-8"
         style={{ marginLeft: "var(--main-margin-left)" }}
         onClick={isMobile && isMobileMenuOpen ? toggleMobileMenu : undefined}
       >
