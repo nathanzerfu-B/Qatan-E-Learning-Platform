@@ -3,9 +3,9 @@
 	 Keep selectors specific to avoid interfering with other app styles.
 */
 
-/* Global page background for light theme */
-html, body {
-	background-color: #f9fafb;
+/* Scoped page background for lesson viewer */
+.lv-page {
+	background-color: #f8fafc;
 	color: #111827;
 }
 
