@@ -1,10 +1,11 @@
 import express from 'express';
 import { getPendingInstructorApplications, approveInstructorApplication, rejectInstructorApplication, validateInstructorPasskey } from '../utils/emailMonitor.js';
+import { authMiddleware, requireRole } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Get all pending instructor applications (Admin only)
-router.get('/pending', async (req, res) => {
+router.get('/pending', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const applications = await getPendingInstructorApplications();
     res.json({ success: true, applications });
@@ -15,7 +16,7 @@ router.get('/pending', async (req, res) => {
 });
 
 // Approve instructor application (Admin only)
-router.post('/:id/approve', async (req, res) => {
+router.post('/:id/approve', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const application = await approveInstructorApplication(parseInt(req.params.id));
     res.json({ success: true, application });
@@ -26,7 +27,7 @@ router.post('/:id/approve', async (req, res) => {
 });
 
 // Reject instructor application (Admin only)
-router.post('/:id/reject', async (req, res) => {
+router.post('/:id/reject', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const application = await rejectInstructorApplication(parseInt(req.params.id));
     res.json({ success: true, application });
