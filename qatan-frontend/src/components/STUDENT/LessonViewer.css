@@ -609,8 +609,16 @@ body.student-dark .lesson-complete-btn:hover {
 
 /* Small responsive tweaks */
 @media (max-width: 640px) {
-	.lv-media { height: 300px; }
-	.lv-placeholder { height: 260px; max-width: 100%; }
+	.lv-media {
+		height: auto !important;
+		aspect-ratio: 16 / 9;
+		max-height: 56.25vw;
+	}
+	.lv-placeholder {
+		height: auto !important;
+		aspect-ratio: 16 / 9;
+		max-width: 100%;
+	}
 }
 
 /* Cinema Studio Layout */
@@ -632,14 +640,21 @@ body.student-dark .lesson-complete-btn:hover {
 }
 
 .lv-sidebar-sticky {
-  position: sticky;
-  top: 1.5rem;
-  max-height: calc(100vh - 3rem);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding-right: 0.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .lv-sidebar-sticky {
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
 }
 
 .lv-top-nav-bar {

@@ -130,7 +130,7 @@ body {
   }
 
   .student-main-content {
-    padding-top: 4.5rem;
+    padding-top: 4.75rem !important;
   }
 
   /* Dark mode mobile menu */

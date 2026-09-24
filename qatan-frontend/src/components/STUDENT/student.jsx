@@ -1652,7 +1652,7 @@ const Student = () => {
         />
       )}
       <div
-        className="student-main-content min-h-screen p-4 sm:p-6 lg:p-8"
+        className="student-main-content min-h-screen pt-16 sm:pt-6 p-4 sm:p-6 lg:p-8"
         style={{ marginLeft: "var(--main-margin-left)" }}
         onClick={isMobile && isMobileMenuOpen ? toggleMobileMenu : undefined}
       >
