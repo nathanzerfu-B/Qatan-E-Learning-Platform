@@ -650,6 +650,150 @@
   }
 }
 
+/* Search & Sort Controls matching brand aesthetic */
+.Main-courses-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .Main-courses-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+}
+
+.Main-search-box {
+  position: relative;
+  flex: 1;
+}
+
+.Main-search-input {
+  width: 100%;
+  padding: 0.625rem 2rem 0.625rem 2.5rem;
+  border: 1px solid #a8b2d2;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.Main-search-input:focus {
+  border-color: #1c6048;
+  box-shadow: 0 0 0 2px rgba(28, 96, 72, 0.15);
+}
+
+.dark .Main-search-input {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #4b5563;
+}
+
+.dark .Main-search-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.Main-search-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem;
+}
+
+.Main-search-clear:hover {
+  color: #000000;
+}
+
+.dark .Main-search-clear:hover {
+  color: #ffffff;
+}
+
+.Main-sort-dropdown {
+  padding: 0.625rem 1rem;
+  border: 1px solid #a8b2d2;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.Main-sort-dropdown:focus {
+  border-color: #1c6048;
+}
+
+.dark .Main-sort-dropdown {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #4b5563;
+}
+
+.Main-active-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.Main-active-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: #ede2e5;
+  color: #1c6048;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #a8b2d2;
+}
+
+.dark .Main-active-pill {
+  background-color: #374151;
+  color: #60a5fa;
+  border-color: #4b5563;
+}
+
+.Main-active-pill button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: inherit;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.Main-clear-filters-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 0.5rem;
+}
+
 .Main-courses-grid {
   display: grid;
   grid-template-columns: 1fr;
