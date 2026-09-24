@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
+import PasswordStrengthMeter from "../ui/PasswordStrengthMeter";
 import "./login.css";
 
 export default function ResetPassword() {
@@ -229,7 +230,7 @@ export default function ResetPassword() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter new password"
                     className="login-input"
-                    minLength={6}
+                    minLength={8}
                     autoFocus
                   />
                   <button
@@ -241,6 +242,7 @@ export default function ResetPassword() {
                     {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
+                <PasswordStrengthMeter password={password} />
               </div>
 
               <div className="form-group">

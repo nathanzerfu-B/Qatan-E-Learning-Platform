@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import PasswordStrengthMeter from "../ui/PasswordStrengthMeter";
 import "./signup.css";
 
 export default function SignUp() {
@@ -345,6 +346,7 @@ export default function SignUp() {
                     👁
                   </button>
                 </div>
+                <PasswordStrengthMeter password={password} />
               </div>
 
               <div className="signup-form-group">

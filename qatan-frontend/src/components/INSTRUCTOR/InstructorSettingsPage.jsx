@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import PasswordStrengthMeter from '../ui/PasswordStrengthMeter';
 
 const SettingsPage = () => {
   const { user, updateUser, darkMode } = useAuth();
@@ -44,11 +45,29 @@ const SettingsPage = () => {
       setLoading(true);
       setMessage({ type: '', text: '' });
     
-      // Validation: check if passwords match
-      if (formData.password && formData.password !== formData.confirmPassword) {
-        setMessage({ type: 'error', text: 'Passwords do not match' });
-        setLoading(false);
-        return;
+      // Validation: check password complexity if changing password
+      if (formData.password) {
+        if (formData.password !== formData.confirmPassword) {
+          setMessage({ type: 'error', text: 'Passwords do not match' });
+          setLoading(false);
+          return;
+        }
+        if (formData.password.length < 8) {
+          setMessage({ type: 'error', text: 'Password must be at least 8 characters long' });
+          setLoading(false);
+          return;
+        }
+        if (
+          !/[a-zA-Z]/.test(formData.password) ||
+          !/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)
+        ) {
+          setMessage({
+            type: 'error',
+            text: 'Password must contain both letters and numbers/symbols',
+          });
+          setLoading(false);
+          return;
+        }
       }
     
       try {
@@ -338,6 +357,7 @@ const SettingsPage = () => {
                 e.target.style.borderColor = 'var(--border-color)';
               }}
             />
+            <PasswordStrengthMeter password={formData.password} />
           </div>
           <div>
             <label

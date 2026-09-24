@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Progress } from "../ui/Progress";
+import PasswordStrengthMeter from "../ui/PasswordStrengthMeter";
 import "./student.css";
 
 const Student = () => {
@@ -1042,6 +1043,7 @@ const Student = () => {
                   e.target.style.borderColor = "var(--border-color)";
                 }}
               />
+              <PasswordStrengthMeter password={formData.password} />
             </div>
             <div>
               <label
