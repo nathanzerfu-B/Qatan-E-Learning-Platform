@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { PrismaClient } from "@prisma/client";
+import { validatePasswordStrength } from "../middleware/securityMiddleware.js";
 
 const prisma = new PrismaClient();
 
@@ -506,6 +507,10 @@ export const updateProfile = async (req, res) => {
 
     // Handle password update
     if (password) {
+      const passwordCheck = validatePasswordStrength(password);
+      if (!passwordCheck.valid) {
+        return res.status(400).json({ success: false, message: passwordCheck.message });
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       updateData.password = hashedPassword;
     }

@@ -733,6 +733,19 @@ const Student = () => {
         return;
       }
 
+      if (formData.password) {
+        if (formData.password.length < 8) {
+          setMessage({ type: "error", text: "Password must be at least 8 characters long" });
+          setLoading(false);
+          return;
+        }
+        if (!/[a-zA-Z]/.test(formData.password) || !/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)) {
+          setMessage({ type: "error", text: "Password must contain both letters and numbers/symbols" });
+          setLoading(false);
+          return;
+        }
+      }
+
       try {
         const formDataToSend = new FormData();
         formDataToSend.append("name", formData.name);

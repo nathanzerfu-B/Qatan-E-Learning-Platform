@@ -269,11 +269,32 @@ function LessonViewer({ lesson, status, onComplete, onNextLesson }) {
 
 function CourseOutline({
   modules,
+  currentLessonId,
   onLessonStart,
   onLessonComplete,
   onQuizStart,
 }) {
-  const [expandedModules, setExpandedModules] = useState({});
+  const [expandedModules, setExpandedModules] = useState(() => {
+    const initial = {};
+    if (modules && modules.length > 0) {
+      initial[modules[0].id] = true;
+    }
+    return initial;
+  });
+
+  // Auto-expand module containing current active lesson
+  useEffect(() => {
+    if (!currentLessonId || !modules) return;
+    const activeModule = modules.find((m) =>
+      m.lessons.some((l) => l.id === currentLessonId)
+    );
+    if (activeModule) {
+      setExpandedModules((prev) => ({
+        ...prev,
+        [activeModule.id]: true,
+      }));
+    }
+  }, [currentLessonId, modules]);
 
   const toggleModule = (moduleId) => {
     setExpandedModules((prev) => ({
@@ -282,8 +303,38 @@ function CourseOutline({
     }));
   };
 
+  const expandAll = () => {
+    const all = {};
+    modules.forEach((m) => {
+      all[m.id] = true;
+    });
+    setExpandedModules(all);
+  };
+
+  const collapseAll = () => {
+    setExpandedModules({});
+  };
+
   return (
     <div className="outline-list">
+      <div className="flex justify-end gap-3 mb-2 px-1">
+        <button
+          type="button"
+          onClick={expandAll}
+          className="text-xs font-semibold text-primary hover:underline"
+        >
+          Expand All
+        </button>
+        <span className="text-xs text-muted-foreground">•</span>
+        <button
+          type="button"
+          onClick={collapseAll}
+          className="text-xs font-semibold text-muted-foreground hover:underline"
+        >
+          Collapse All
+        </button>
+      </div>
+
       {modules.map((module) => (
         <div key={module.id} className="outline-module">
           <div className="module-header">
@@ -312,6 +363,7 @@ function CourseOutline({
                 <LessonItem
                   key={lesson.id}
                   lesson={lesson}
+                  isActive={lesson.id === currentLessonId}
                   onStart={onLessonStart}
                   onComplete={onLessonComplete}
                 />
@@ -341,7 +393,7 @@ function CourseOutline({
   );
 }
 
-function LessonItem({ lesson, onStart, onComplete }) {
+function LessonItem({ lesson, isActive, onStart, onComplete }) {
   const { name, status, locked } = lesson;
 
   const handleStart = () => {
@@ -357,15 +409,24 @@ function LessonItem({ lesson, onStart, onComplete }) {
   };
 
   return (
-    <div className={`lesson-item ${locked ? "lesson-locked" : ""}`}>
+    <div
+      className={`lesson-item ${locked ? "lesson-locked" : ""} ${
+        isActive ? "lesson-item-active" : ""
+      }`}
+    >
       <span
         className={`lesson-name ${
           !locked && status !== "completed" ? "lesson-clickable" : ""
         }`}
         onClick={!locked && status !== "completed" ? handleStart : undefined}
       >
-        {locked ? "🔒 " : ""}
+        {locked ? "🔒 " : isActive ? "▶️ " : ""}
         {name}
+        {isActive && (
+          <span className="ml-2 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-primary/20 text-primary">
+            Playing
+          </span>
+        )}
       </span>
       <div className="lesson-actions">
         <span
@@ -1116,6 +1177,7 @@ export default function App() {
             <h4 className="lv-section-title">Course Outline</h4>
             <CourseOutline
               modules={modules}
+              currentLessonId={currentLesson?.id}
               onLessonStart={handleLessonStart}
               onLessonComplete={handleLessonComplete}
               onQuizStart={handleQuizStart}

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import cloudinary, { uploadToCloudinary } from "../utils/cloudinary.js";
 import bcrypt from "bcryptjs";
+import { validatePasswordStrength } from "../middleware/securityMiddleware.js";
 
 const prisma = new PrismaClient();
 
@@ -32,6 +33,10 @@ export const updateInstructorProfile = async (req, res) => {
     if (bio !== undefined) updateData.bio = bio;
     if (profilePictureUrl) updateData.profilePicture = profilePictureUrl;
     if (password) {
+      const passwordCheck = validatePasswordStrength(password);
+      if (!passwordCheck.valid) {
+        return res.status(400).json({ success: false, message: passwordCheck.message });
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
       updateData.password = hashedPassword;
     }

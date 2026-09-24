@@ -49,3 +49,8 @@ export const notFoundHandler = (req, res) => {
     message: `Cannot ${req.method} ${req.originalUrl} - Route not found`,
   });
 };
+
+// Async route handler wrapper to safely forward errors to errorHandler
+export const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};

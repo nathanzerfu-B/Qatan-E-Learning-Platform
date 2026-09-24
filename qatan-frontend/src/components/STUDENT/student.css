@@ -418,3 +418,39 @@ input:checked ~ .student-decoration {
   background: white;
   box-shadow: -12px 0 0 white, -6px 0 0 1.6px white, 5px 15px 0 1px white, 1px 17px 0 white, 10px 17px 0 white;
 }
+
+/* Mobile Navigation & Responsive Overhauls */
+.student-mobile-menu-button {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.student-mobile-menu-button:hover {
+  transform: scale(1.05);
+}
+
+.student-mobile-menu-button:active {
+  transform: scale(0.95);
+}
+
+@media (min-width: 769px) {
+  .student-mobile-menu-button {
+    display: none !important;
+  }
+}
