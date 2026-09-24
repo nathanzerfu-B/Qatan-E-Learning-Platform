@@ -1,0 +1,59 @@
+name: Qatan CI Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    name: Backend Test Suite & Security Validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./qatan-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './qatan-backend/package.json'
+
+      - name: Install backend dependencies
+        run: npm install
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run automated test suite
+        run: npm test
+
+  build-frontend:
+    name: Frontend Production Bundle Validation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./qatan-frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './qatan-frontend/package.json'
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build frontend production bundle
+        run: npm run build

@@ -1,5 +1,8 @@
 # Qatan — Full-Stack E-Learning & Course Management Platform
 
+[![CI Quality Gate](https://github.com/nathanzerfu-B/Qatan-E-Learning-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/nathanzerfu-B/Qatan-E-Learning-Platform/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/Tests-38%20Passed-brightgreen?logo=node.js&logoColor=white)](https://github.com/nathanzerfu-B/Qatan-E-Learning-Platform)
+[![Security](https://img.shields.io/badge/Security-Helmet%20%7C%20RBAC%20%7C%20CSP-blue?logo=auth0&logoColor=white)](https://github.com/nathanzerfu-B/Qatan-E-Learning-Platform)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
